@@ -1,0 +1,31 @@
+# Pinned loosely; will tighten before v0.1-baseline.
+# Target: Python 3.11
+
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+matplotlib>=3.8
+seaborn>=0.13
+PyYAML>=6.0
+tqdm>=4.66
+
+# Audio
+torch>=2.2
+torchaudio>=2.2
+librosa>=0.10
+soundfile>=0.12
+
+# Diffusion
+einops>=0.7
+denoising-diffusion-pytorch>=1.10  # lucidrains, used as starting point
+
+# Tracking
+wandb>=0.16
+
+# AWS (Phase 2)
+boto3>=1.34
+sagemaker>=2.215
+
+# Dev
+pytest>=8.0
+ruff>=0.4

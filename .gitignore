@@ -1,0 +1,66 @@
+# Raw data — never commit
+data/raw/
+data/external/
+data/cache/
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# Model checkpoints (push to S3 instead)
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Results / runs
+results/
+runs/
+wandb/
+mlruns/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+*.egg-info/
+build/
+dist/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# AWS / secrets
+.aws/
+*.pem
+.env
+.env.*
+!.env.example
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+report/figures/_cache/
+
+# Plan files (private)
+.claude/
