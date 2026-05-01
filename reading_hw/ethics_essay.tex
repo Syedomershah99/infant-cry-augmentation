@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{parskip}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\begin{center}
+{\large\bfseries Ethics Review of an Infant Cry Classification System with Class-Conditional Generative Augmentation}\\[2pt]
+{\small Syed Omer Shah \quad\textbar\quad \texttt{syedomer@buffalo.edu} \quad\textbar\quad CSE 4/555 Reading/Writing Assignment I \quad\textbar\quad May 5, 2026}
+\end{center}
+\vspace{-0.5em}
+
+\section*{Project and Hypothetical Use Case}
+My final project trains a class-conditional diffusion model on log-mel spectrograms of infant cries (donateacry-corpus, 457 clips, five labels: \textit{belly\_pain, burping, discomfort, hungry, tired}) and uses the synthetic samples to augment the rarest classes for a downstream classifier. The research question is whether generative augmentation improves rare-class recall over classical augmentation under noisy or out-of-distribution conditions. To make the review concrete I situate the system in a plausible product, \textbf{``MyBabyListen''}: a smartphone app that listens through the nursery microphone and notifies a caregiver with a probable cause (e.g., ``likely belly pain, 0.74'') so they can decide whether to check on the baby. The same model could ship to NICU step-down units as decision support for night-shift staff.
+
+\section*{Applying the Five Pillars}
+
+\textbf{Transparency.} The product ships a public \textit{model card} (intended use, out-of-scope use, per-class metrics, known failure modes) and a \textit{datasheet} describing the corpora --- including the severe imbalance (hungry 84\%, burping 2\%) and the absence of demographic annotations. The classifier exposes calibrated probabilities and a brief explanation, not a single asserted label.
+
+\textbf{Accountability.} The product is framed as \textbf{decision support, not diagnosis}, with a clear chain of responsibility: developer for model behavior on the audited population, hospital integrator for clinical workflow, caregiver for the action taken. Versioned releases and a public issue tracker enable post-deployment recourse, and an FDA Software-as-a-Medical-Device pathway is pursued before any clinical claim.
+
+\textbf{Fairness.} Per-class precision, recall, and false-negative rate are reported alongside macro-F1; a single aggregate number is exactly what hides harm to rare classes. Donateacry-corpus skews toward English-speaking, Western, smartphone-equipped households, so cross-source held-out evaluation runs as a proxy for population shift. Generative augmentation is treated as a \textit{fairness intervention}: it is targeted at the rare classes (\textit{belly\_pain}, \textit{burping}) and its effect on those slices is the headline metric, not a footnote.
+
+\textbf{Privacy.} Infant audio is sensitive. The deployed product does \textbf{on-device inference} only --- no clip is uploaded by default, and any cloud feature is opt-in with revocable consent. Only manifests, not raw clips, are committed to the open-source repository, and the project does not attempt speaker identification. Compliance targets HIPAA for clinical deployment and GDPR/CCPA for consumer use, with data-minimization defaults (no caregiver demographic field is collected).
+
+\textbf{Safety and Security.} A \textit{missed pain cry} is the failure mode that matters most, so false-negative rate on \textit{belly\_pain} is reported as a first-class metric alongside calibration error. Robustness is evaluated under MUSAN babble at multiple SNRs and on cross-source held-out clips. The app never autonomously dispenses medication or triggers an alarm cascade; notification thresholds are calibrated against the false-positive cost of waking a household at 3~a.m.
+
+\section*{My Viewpoint}
+The direct-to-consumer parent-app framing is more ethically fraught than the NICU decision-support framing, despite being more attractive commercially. A new parent at 3~a.m., shown a confident-looking probability, is far more likely to over-rely on a model trained on 457 clips than a trained nurse would be. The \textit{accountability} pillar makes this concrete: the parent is the only party in the consumer chain, and the system is shaping how they interpret real distress. I would not deploy the consumer version without (a) showing per-class confidence in plain language including the model's uncertainty, (b) failing-safe to ``go check on your baby'' on low-confidence predictions, and (c) refusing to ship any class for which held-out per-class recall does not exceed an explicit, published bar.
+
+\section*{Alternative Resolutions and Risks}
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=1pt]
+    \item \textbf{Ship as decision support; never as diagnosis.} The model surfaces a probability and a recommended next step, never a clinical label. Risk: users still over-trust the output (automation bias [5]); mitigated by UI friction on low-confidence cases.
+    \item \textbf{Do not deploy until a clinical trial.} Most cautious. Risk: opportunity cost; a research artifact never reaches the parents who could benefit; mitigated by interim release as an open benchmark with no consumer wrapper.
+    \item \textbf{Deploy only the high-recall classes.} Ship \textit{hungry} but withhold \textit{belly\_pain} until its recall passes a published bar. Risk: paradoxically removes the clinically valuable signal; mitigated by an in-app note that pain detection is intentionally not offered until validated.
+\end{enumerate}
+
+\section*{Analogous Cases}
+The \textbf{Optum healthcare-allocation algorithm} (Obermeyer et al., \textit{Science}, 2019) used spending as a proxy for need and systematically under-referred Black patients --- the canonical case for why a single aggregate metric masks per-slice harm and motivates the per-class FNR reporting here. \textbf{Pulse-oximeter racial bias} (Sjoding et al., \textit{NEJM}, 2020) shows that a sensor whose calibration population was demographically narrow can produce silent harm at scale, directly analogous to a cry corpus collected from one connected demographic. \textbf{IBM Watson for Oncology} was rolled back at MD Anderson for confidently recommending unsafe treatments [4], which justifies the decision-support framing and the regulatory pathway. \textbf{COMPAS recidivism} (Angwin et al., \textit{ProPublica}, 2016) is the textbook case for why an opaque model in a high-stakes pipeline must be auditable per-slice, not just on aggregate accuracy. Together, these cases support the project's choices: per-class metric reporting, cross-source robustness audits, decision-support framing, and conservative deployment thresholds.
+
+{\footnotesize
+\textbf{References.}
+[1] Obermeyer, Z.\ et al.\ (2019). Dissecting racial bias in an algorithm used to manage the health of populations. \textit{Science}, 366(6464), 447--453.\;
+[2] Sjoding, M.~W.\ et al.\ (2020). Racial bias in pulse oximetry measurement. \textit{NEJM}, 383(25), 2477--2478.\;
+[3] Angwin, J.\ et al.\ (2016). Machine bias. \textit{ProPublica}, May 23.\;
+[4] Ross, C.\ \& Swetlitz, I.\ (2018). IBM's Watson recommended `unsafe and incorrect' cancer treatments. \textit{STAT News}, Jul.\ 25.\;
+[5] Parasuraman, R.\ \& Riley, V.\ (1997). Humans and automation. \textit{Human Factors}, 39(2), 230--253.\;
+[6] Gebru, T.\ et al.\ (2021). Datasheets for datasets. \textit{CACM}, 64(12), 86--92.\;
+[7] Mitchell, M.\ et al.\ (2019). Model cards for model reporting. \textit{Proc.\ FAT*}, 220--229.
+}
+
+\end{document}
