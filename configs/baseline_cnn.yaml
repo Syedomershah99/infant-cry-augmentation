@@ -1,0 +1,55 @@
+# Baseline CNN classifier on donateacry log-mel spectrograms.
+# This is the no-augmentation cell of the experiment matrix; classical and
+# generative variants override `aug_type` and (for generative) `synth_manifest`.
+
+seed: 0
+device: auto                 # auto -> cuda > mps > cpu
+out_dir: results/baseline_seed0
+
+manifests:
+  train: data/manifests/train.csv
+  val:   data/manifests/val.csv
+  test:  data/manifests/test.csv
+
+# Augmentation arm: one of {none, classical, generative, classical+generative}
+aug_type: none
+synth_manifest: data/manifests/synth_train.csv  # used only when aug_type contains "generative"
+
+features:
+  sample_rate: 16000
+  n_mels: 64
+  n_fft: 1024
+  hop_length: 512
+  f_min: 50.0
+  f_max: 8000.0
+  target_frames: 128
+  target_seconds: 5.0
+  log_offset: 1.0e-6
+
+specaug:
+  time_mask_param: 16
+  freq_mask_param: 8
+  n_time_masks: 2
+  n_freq_masks: 2
+  noise_std: 0.02
+  time_shift_frac: 0.1
+  apply_prob: 0.8
+
+# Imbalance handling: weighted CE + optional weighted sampler.
+# Imbalance handling for the NAIVE baseline: weighted CE only.
+# A balanced sampler is intentionally NOT used here, because the goal is to
+# demonstrate the rare-class failure mode that motivates the generative
+# augmentation extension. See PLAN.md and ethics/bias_audit.md.
+class_weight_scheme: inverse_sqrt   # none | inverse | inverse_sqrt
+use_class_weighted_loss: true
+balanced_sampler: false
+
+# Model + optim
+base_channels: 32
+dropout: 0.2
+batch_size: 32
+num_workers: 0
+epochs: 30
+lr: 1.0e-3
+weight_decay: 1.0e-4
+label_smoothing: 0.05

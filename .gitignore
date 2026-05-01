@@ -15,11 +15,16 @@ checkpoints/
 *.bin
 *.safetensors
 
-# Results / runs
-results/
+# Results / runs (large artifacts: checkpoints, intermediate state)
+results/*/best.pt
+results/*/last.pt
+results/*/*.pt
 runs/
 wandb/
 mlruns/
+# Keep the README and small JSON summaries committed
+!results/README.md
+!results/*/result.json
 
 # Python
 __pycache__/
