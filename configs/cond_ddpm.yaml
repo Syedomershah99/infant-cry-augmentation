@@ -1,0 +1,44 @@
+# Class-conditional DDPM on log-mel spectrograms.
+# Trained on the train split only, never sees val/test.
+
+seed: 0
+device: auto
+out_dir: results/ddpm_seed0
+
+manifests:
+  train: data/manifests/train.csv
+  val:   data/manifests/val.csv     # not used during diffusion training; kept for symmetry
+  test:  data/manifests/test.csv
+
+features:
+  sample_rate: 16000
+  n_mels: 64
+  n_fft: 1024
+  hop_length: 512
+  f_min: 50.0
+  f_max: 8000.0
+  target_frames: 128
+  target_seconds: 5.0
+  log_offset: 1.0e-6
+
+# UNet
+# base_ch=32 with mults [1,2,4] gives a ~3.4M-param denoiser, sized for the
+# 320-clip train set (a 13M version overfits hard).
+base_ch: 32
+ch_mults: [1, 2, 4]
+dropout: 0.1
+
+# DDPM scheduler + classifier-free guidance
+ddpm:
+  timesteps: 1000
+  beta_start: 1.0e-4
+  beta_end: 2.0e-2
+  cfg_dropout: 0.1
+
+# Optim
+batch_size: 32
+num_workers: 0
+epochs: 150
+log_every: 10
+lr: 2.0e-4
+weight_decay: 0.0

@@ -31,6 +31,25 @@
 - Demographic features of the upstream corpora are not annotated, so direct demographic-fairness slicing is not possible.
 - Cross-source generalization is a *proxy* for demographic robustness — gaps may be due to source-specific recording conditions rather than population differences. The audit should be read as a lower bound on population-level concerns.
 
+## Numeric findings — Phase 1 baselines (seed=0, 30 epochs)
+
+The two naive baselines below are the empirical motivation for the project.
+Both achieve high overall accuracy by predicting the majority class
+(`hungry`) for every input, and zero recall on the safety-critical rare
+classes. This is exactly the failure mode the per-class FNR audit and the
+generative augmentation extension are designed to address.
+
+| Augmentation | macro-F1 | accuracy | belly_pain recall | burping recall | ECE |
+|---|---:|---:|---:|---:|---:|
+| none | 0.183 | 0.841 | **0.00** | **0.00** | 0.48 |
+| classical | 0.183 | 0.841 | **0.00** | **0.00** | 0.51 |
+
+Aggregate accuracy here is *worse* than per-class recall in the ethics-relevant
+sense: a parent-facing app reporting 84% accuracy with zero ability to detect
+pain would be actively dangerous. The fairness intervention reported in
+Phase 3 (generative augmentation targeted at rare classes) is evaluated
+against this baseline.
+
 ## Numeric findings — donateacry-corpus (Phase 0 EDA)
 
 Total: 457 clips, seed=42 stratified split.

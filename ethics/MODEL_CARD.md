@@ -48,12 +48,27 @@ donateacry-corpus train split. Optional pretraining for the diffusion model on a
 
 ## Quantitative analyses
 
-_(Tables to be populated at v0.3-results)_
+### Baselines (Phase 1, single seed=0, donateacry test split, n=69)
 
-- Per-class F1 / recall, with and without each augmentation type, at each ratio.
-- Calibration (ECE) per condition.
-- Robustness gap per condition.
-- FAD proxy and synthetic-class consistency.
+| Augmentation | macro-F1 | accuracy | belly_pain recall | burping recall | ECE |
+|---|---:|---:|---:|---:|---:|
+| none | 0.183 | 0.841 | **0.00** | **0.00** | 0.48 |
+| classical (SpecAug + noise + time-shift) | 0.183 | 0.841 | **0.00** | **0.00** | 0.51 |
+
+Both naive baselines collapse to predicting the majority class (`hungry`,
+84% of test). Aggregate accuracy is misleading; per-class recall on the
+safety-critical `belly_pain` class is zero.
+
+### Generative arm + multi-seed matrix (Phase 3)
+
+_(populated after `python -m experiments.run_matrix`)_
+
+- Per-class F1 / recall under generative and classical+generative aug, at
+  synth-to-real ratios {0,1,5,10}, three seeds each.
+- ECE per condition.
+- Robustness gap (clean vs. additive babble noise; cross-source if a second
+  corpus is integrated).
+- FAD proxy and synthetic-class consistency for the diffusion model.
 
 ## Ethical considerations
 

@@ -69,26 +69,47 @@ reading_hw/     # individual ethics essay (PDF deliverable)
 tests/          # unit tests + leakage assertions
 ```
 
-## Reproduction (will be filled in as code lands)
+## Reproduction
 
 ```bash
-# 1. Environment
+# 1. Environment (Python 3.9+; tested on 3.9 with torch 2.8 on Apple MPS)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 2. Data
-python -m src.data.fetch_donateacry        # downloads raw clips to data/raw/
-python -m src.data.build_manifests         # writes data/manifests/*.csv
+# 2. Data — clones donateacry-corpus into data/raw/ (gitignored), then builds manifests
+mkdir -p data/raw && cd data/raw \
+  && git clone --depth 1 https://github.com/gveres/donateacry-corpus.git && cd ../..
+python -m src.data.build_manifests
+pytest tests/test_no_leakage.py            # sanity check: no test files in train
 
-# 3. Baseline classifier
+# 3. Baseline classifier (no augmentation; intentionally collapses on rare classes)
 python -m src.training.train_classifier --config configs/baseline_cnn.yaml
+python -m src.training.train_classifier --config configs/baseline_classical.yaml
 
-# 4. Conditional diffusion (AWS SageMaker)
-python -m src.aws.sagemaker_launch --job train_diffusion --config configs/cond_ddpm.yaml
+# 4. Conditional diffusion + sample synthetic spectrograms for rare classes
+python -m src.training.train_diffusion --config configs/cond_ddpm.yaml
+python -m src.training.sample_diffusion \
+    --ckpt results/ddpm_seed0/best.pt \
+    --per_class belly_pain=110,burping=60 \
+    --cfg_scale 2.0 --steps 50
 
-# 5. Experiment matrix
-python -m experiments.run_matrix --out results/matrix.csv
+# 5. Generative augmentation arms
+python -m src.training.train_classifier --config configs/baseline_generative.yaml
+python -m src.training.train_classifier --config configs/baseline_classical_generative.yaml
+
+# 6. Full experiment matrix (multi-seed, ratio sweep)
+python -m experiments.run_matrix --out results/matrix.csv \
+    --seeds 0 1 2 --ratios 0 1 5 10 --epochs 30
 ```
+
+### Headline numbers so far (seed=0, 30 epochs)
+
+| Augmentation | macro-F1 | belly_pain recall | burping recall | ECE |
+|---|---:|---:|---:|---:|
+| none | 0.183 | **0.00** | **0.00** | 0.48 |
+| classical | 0.183 | **0.00** | **0.00** | 0.51 |
+| generative | _(pending Phase 2)_ | | | |
+| classical+generative | _(pending Phase 2)_ | | | |
 
 ## Plan
 
