@@ -59,16 +59,32 @@ Both naive baselines collapse to predicting the majority class (`hungry`,
 84% of test). Aggregate accuracy is misleading; per-class recall on the
 safety-critical `belly_pain` class is zero.
 
-### Generative arm + multi-seed matrix (Phase 3)
+### Augmentation matrix (4 arms × 3 seeds, synth ratio 10×, 30 epochs)
 
-_(populated after `python -m experiments.run_matrix`)_
+| Arm | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE (mean) |
+|---|---:|---:|---:|---:|---:|
+| none                 | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| classical            | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| generative           | 0.182 | 0.831 | 0.00 | 0.00 | **0.37** |
+| classical+generative | 0.183 | 0.841 | 0.00 | 0.00 | **0.39** |
 
-- Per-class F1 / recall under generative and classical+generative aug, at
-  synth-to-real ratios {0,1,5,10}, three seeds each.
-- ECE per condition.
-- Robustness gap (clean vs. additive babble noise; cross-source if a second
-  corpus is integrated).
-- FAD proxy and synthetic-class consistency for the diffusion model.
+Rare-class recall is zero in every cell of the matrix. Generative
+augmentation reduces ECE by approximately 10 points without changing the
+classifier's argmax. The synthetic samples contain useful class signal (a
+class-consistency probe identifies 51% of synthetic belly_pain as belly_pain)
+but the signal is below the classifier's decision threshold under
+class-weighted CE alone.
+
+### Sample-quality probe (30-epoch DDPM, CFG=2.0)
+
+| Class | n synth | probe recall | probe precision | probe F1 |
+|---|---:|---:|---:|---:|
+| belly_pain | 110 | 0.51 | 0.88 | 0.64 |
+| burping    | 60  | 0.00 | 0.00 | 0.00 |
+
+The asymmetry is consistent with diffusion training data: belly_pain has 11
+real training clips, burping has 6, and below this threshold the DDPM did
+not learn a class-discriminative manifold for burping.
 
 ## Ethical considerations
 

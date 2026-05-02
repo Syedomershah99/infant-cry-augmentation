@@ -31,6 +31,27 @@
 - Demographic features of the upstream corpora are not annotated, so direct demographic-fairness slicing is not possible.
 - Cross-source generalization is a *proxy* for demographic robustness — gaps may be due to source-specific recording conditions rather than population differences. The audit should be read as a lower bound on population-level concerns.
 
+## Numeric findings — Phase 3 augmentation matrix (4 arms × 3 seeds)
+
+The full augmentation matrix at synthetic-to-real ratio 10× shows that none
+of the four arms flips the classifier's argmax on the safety-critical rare
+classes. This is the headline fairness finding of the project.
+
+| Arm | macro-F1 | belly_pain rec. | burping rec. | ECE (mean) |
+|---|---:|---:|---:|---:|
+| none                 | 0.183 | 0.00 | 0.00 | 0.48 |
+| classical            | 0.183 | 0.00 | 0.00 | 0.48 |
+| generative           | 0.182 | 0.00 | 0.00 | 0.37 |
+| classical+generative | 0.183 | 0.00 | 0.00 | 0.39 |
+
+The fairness intervention (generative augmentation targeted at rare classes)
+delivers a measurable but partial benefit: it reduces calibration error by
+about 10 points without changing the safety-critical FNR. In the user-facing
+sense, this means a deployed system would be less overconfident on its
+mispredictions, but would still miss every pain cry. The intended
+intervention does not cross the threshold needed to actually improve safety
+behavior at this data scale.
+
 ## Numeric findings — Phase 1 baselines (seed=0, 30 epochs)
 
 The two naive baselines below are the empirical motivation for the project.

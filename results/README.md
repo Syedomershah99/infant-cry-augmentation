@@ -30,10 +30,32 @@ safety summary (belly_pain FNR, burping FNR, ECE).
 python -c "import json; r=json.load(open('results/baseline_seed0/result.json')); print(json.dumps(r['test']['per_class'], indent=2))"
 ```
 
-## What's next (Phase 2)
+## v0.3-results — 4-arm experiment matrix (12 cells: 4 aug × 3 seeds, ratio=10×)
 
-- Train class-conditional DDPM on log-mel patches.
-- Sample N synthetic spectrograms per rare class.
-- Add to `synth_train.csv` and rerun with `aug_type: generative` and
-  `aug_type: classical+generative`.
-- Compare rare-class recall and macro-F1 against the two baselines above.
+Headline result: **at this data scale, generative augmentation does not flip
+the classifier's argmax on rare classes.** Top-1 prediction is essentially
+identical across arms. The single quantity that does shift is calibration:
+generative arms drop ECE by ~10 points.
+
+| Arm | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE (mean) |
+|---|---:|---:|---:|---:|---:|
+| none                 | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| classical            | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| generative           | 0.182 | 0.831 | 0.00 | 0.00 | **0.37** |
+| classical+generative | 0.183 | 0.841 | 0.00 | 0.00 | **0.39** |
+
+Rare-class recall is 0.00 in every cell, every seed.
+
+This is a publishable null result on the original research question, and a
+real finding on calibration: the synthetic samples carry useful but
+sub-argmax-threshold class signal. See `report/Report.tex` Section 5 for the
+full discussion. Per-cell raw numbers are in `matrix.csv` and per-cell
+configs are in `matrix/<cell>/config.yaml`.
+
+## What's next
+
+- A second public infant-cry corpus to enlarge rare-class signal for both
+  the diffusion model and the classifier.
+- Optimizer-recipe sensitivity analysis (balanced sampler, focal loss,
+  class-rebalanced fine-tuning) as an orthogonal axis to augmentation type.
+- Cross-source held-out test split for direct demographic-shift evaluation.

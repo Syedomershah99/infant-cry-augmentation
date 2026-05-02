@@ -1,18 +1,12 @@
-# Generative augmentation arm.
-# Adds DDPM-sampled rare-class spectrograms via synth_train.csv.
-
 seed: 0
 device: auto
-out_dir: results/generative_seed0
-
+out_dir: results/matrix/classical_r0_s0
 manifests:
   train: data/manifests/train.csv
-  val:   data/manifests/val.csv
-  test:  data/manifests/test.csv
-
-aug_type: generative
+  val: data/manifests/val.csv
+  test: data/manifests/test.csv
+aug_type: classical
 synth_manifest: data/manifests/synth_train.csv
-
 features:
   sample_rate: 16000
   n_mels: 64
@@ -22,8 +16,7 @@ features:
   f_max: 8000.0
   target_frames: 128
   target_seconds: 5.0
-  log_offset: 1.0e-6
-
+  log_offset: 1.0e-06
 specaug:
   time_mask_param: 16
   freq_mask_param: 8
@@ -32,20 +25,14 @@ specaug:
   noise_std: 0.02
   time_shift_frac: 0.1
   apply_prob: 0.8
-
-# Same training config as baseline_cnn.yaml and baseline_classical.yaml so that the
-# only difference between the four augmentation arms is the aug_type itself. This is
-# a clean ablation: changing the sampler / loss between arms would conflate the
-# augmentation effect with the optimizer recipe.
 class_weight_scheme: inverse_sqrt
 use_class_weighted_loss: true
 balanced_sampler: false
-
 base_channels: 32
 dropout: 0.2
 batch_size: 32
 num_workers: 0
 epochs: 30
-lr: 1.0e-3
-weight_decay: 1.0e-4
+lr: 0.001
+weight_decay: 0.0001
 label_smoothing: 0.05

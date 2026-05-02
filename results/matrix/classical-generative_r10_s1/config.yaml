@@ -1,0 +1,38 @@
+seed: 1
+device: auto
+out_dir: results/matrix/classical-generative_r10_s1
+manifests:
+  train: data/manifests/train.csv
+  val: data/manifests/val.csv
+  test: data/manifests/test.csv
+aug_type: classical+generative
+synth_manifest: results/matrix/classical-generative_r10_s1/synth_subset.csv
+features:
+  sample_rate: 16000
+  n_mels: 64
+  n_fft: 1024
+  hop_length: 512
+  f_min: 50.0
+  f_max: 8000.0
+  target_frames: 128
+  target_seconds: 5.0
+  log_offset: 1.0e-06
+specaug:
+  time_mask_param: 16
+  freq_mask_param: 8
+  n_time_masks: 2
+  n_freq_masks: 2
+  noise_std: 0.02
+  time_shift_frac: 0.1
+  apply_prob: 0.8
+class_weight_scheme: inverse_sqrt
+use_class_weighted_loss: true
+balanced_sampler: false
+base_channels: 32
+dropout: 0.2
+batch_size: 32
+num_workers: 0
+epochs: 30
+lr: 0.001
+weight_decay: 0.0001
+label_smoothing: 0.05

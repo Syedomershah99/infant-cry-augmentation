@@ -102,14 +102,23 @@ python -m experiments.run_matrix --out results/matrix.csv \
     --seeds 0 1 2 --ratios 0 1 5 10 --epochs 30
 ```
 
-### Headline numbers so far (seed=0, 30 epochs)
+### Headline numbers (4 arms × 3 seeds, synth ratio 10×, 30 epochs)
 
-| Augmentation | macro-F1 | belly_pain recall | burping recall | ECE |
-|---|---:|---:|---:|---:|
-| none | 0.183 | **0.00** | **0.00** | 0.48 |
-| classical | 0.183 | **0.00** | **0.00** | 0.51 |
-| generative | _(pending Phase 2)_ | | | |
-| classical+generative | _(pending Phase 2)_ | | | |
+| Arm | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE (mean) |
+|---|---:|---:|---:|---:|---:|
+| none                 | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| classical            | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
+| generative           | 0.182 | 0.831 | 0.00 | 0.00 | **0.37** |
+| classical+generative | 0.183 | 0.841 | 0.00 | 0.00 | **0.39** |
+
+**Reading.** The classifier collapses to "always hungry" in every cell, every
+seed. Aggregate accuracy is misleading at 84%; rare-class recall is 0.
+The single quantity generative augmentation does shift is calibration:
+ECE drops by ~10 points across seeds. The synthetic samples carry useful
+class signal (a class-consistency probe identifies 51% of synthetic
+belly_pain as belly_pain) but it is below the classifier's argmax
+threshold under class-weighted CE alone. See `report/Report.pdf` for the
+full discussion and `results/matrix.csv` for raw numbers.
 
 ## Plan
 
