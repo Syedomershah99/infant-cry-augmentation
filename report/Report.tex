@@ -1,0 +1,122 @@
+\documentclass[final]{article}
+
+\usepackage{nips_2017}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+
+\title{Class-Conditional Generative Augmentation for Rare-Class Infant Cry Classification}
+
+\author{
+  Syed Omer Shah\\
+  Group \#: \emph{TBD} \\
+  Department of Computer Science and Engineering\\
+  University at Buffalo\\
+  Buffalo, NY 14260 \\
+  \texttt{syedomer@buffalo.edu} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Infant cry classification is a clinically-adjacent task in which the rarest classes (such as pain) are also the most safety-critical. Public corpora like donateacry-corpus are heavily imbalanced (in this case, 84\% \textit{hungry} vs.\ 1.8\% \textit{burping}), and naive classifiers achieve high aggregate accuracy by collapsing onto the majority class while missing every clinically interesting case. We study whether a small class-conditional denoising diffusion probabilistic model (DDPM) trained on log-mel spectrograms can produce useful synthetic samples for the rarest classes, evaluated against a controlled experimental matrix over augmentation type, synthetic-to-real ratio, and test condition. Our naive log-mel CNN baseline reaches macro-F1 = 0.18 with zero recall on \textit{belly\_pain} and \textit{burping}. SpecAugment-style classical augmentation does not move these numbers. We then report the effect of generative augmentation on rare-class recall and on calibration, with explicit per-class metrics and a fairness audit. The project is released open source with a datasheet, model card, and pre-registered evaluation harness.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+Audio-based infant cry classification is studied as a possible decision-support input for parental apps and neonatal monitoring. The clinical and ethical risk profile of such a system is dominated by its behavior on rare, safety-critical classes: a missed pain cry has a far higher cost than a missed hunger cue. However, public datasets are dominated by a single majority class, and the standard pattern recognition pipeline can achieve high accuracy by trivially predicting that class for every input. We argue that the relevant evaluation question is not aggregate accuracy or even macro-F1, but per-class recall on rare classes, under realistic noise and out-of-distribution conditions. Synthetic data augmentation has been studied in audio classification, but it has rarely been framed as a fairness intervention targeted at safety-critical rare classes. We close this gap with a small, fully reproducible study and an explicit ethics review.
+
+\section{Related Works}\label{sec:past}
+\textit{(To be expanded.)}
+We position the work at the intersection of three small literatures: infant-cry classification on public corpora (e.g., donateacry, Baby Chillanto); synthetic data augmentation for audio (SpecAugment, MixUp on spectrograms, vocoder-based augmentation, audio diffusion); and class-imbalance interventions in clinically-adjacent ML, including fairness audits with per-class FNR reporting. Prior work either targets aggregate accuracy or treats augmentation as a generic regularizer; we instead frame generative augmentation as a per-class fairness intervention and report a per-class accountability table.
+
+\section{Data}\label{sec:data}
+We use the \textbf{donateacry-corpus} \cite{donateacry}, a community-collected dataset of 457 caregiver-uploaded infant cry clips labeled with five causes: \textit{belly\_pain, burping, discomfort, hungry, tired}. We resample to 16~kHz mono, fix duration to 5~s by center-crop or zero-pad, and compute log-mel spectrograms with 64 mel bands, $n_\text{fft}=1024$, hop length 512, producing $(1, 64, 128)$ tensors. Splits are class-stratified at the file level (seed=42, 70/15/15), and a pytest assertion verifies that no test file ever appears in any synthesis or augmentation manifest. The corpus is heavily imbalanced (Table~\ref{tab:counts}); the rarest classes (\textit{burping} with 8 clips, \textit{belly\_pain} with 16 clips) are the safety-critical targets.
+
+\begin{table}[H]
+\centering
+\caption{donateacry-corpus class counts after stratified split (seed=42).}\label{tab:counts}
+\begin{tabular}{lrrrrr}
+\toprule
+Class & All & Train & Val & Test & \% \\
+\midrule
+hungry      & 382 & 267 & 57 & 58 & 83.6 \\
+discomfort  & 27  & 19  & 4  & 4  & 5.9 \\
+tired       & 24  & 17  & 4  & 3  & 5.3 \\
+belly\_pain & 16  & 11  & 2  & 3  & 3.5 \\
+burping     & 8   & 6   & 1  & 1  & 1.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Methods}\label{sec:approach}
+\paragraph{Baseline classifier.} A four-block convolutional network on log-mel input with batch normalization, dropout, and a global-average-pooling head ($\sim$1.2M parameters). Trained with class-weighted cross entropy (inverse-square-root frequencies) and cosine learning rate decay over 30 epochs.
+
+\paragraph{Classical augmentation.} SpecAugment-style time and frequency masking, time shift, and additive Gaussian noise applied to the standardized log-mel spectrogram with probability 0.8. This is the strongest readily-available augmentation that does not require any new data.
+
+\paragraph{Class-conditional diffusion.} A small UNet ($\sim$3.8M parameters) with FiLM-conditioned residual blocks and a single self-attention block at the bottleneck resolution. The conditioning vector concatenates a sinusoidal time embedding with a class label embedding (one extra slot reserved as a null class for classifier-free guidance). The DDPM uses 1000 timesteps with a linear $\beta$ schedule. Sampling uses 50-step DDIM with classifier-free guidance scale 2.0. We train only on the train split.
+
+\paragraph{Augmentation arms.}
+\begin{itemize}
+\item \textbf{none}: train on the train split only.
+\item \textbf{classical}: as above + SpecAugment.
+\item \textbf{generative}: train split + synthetic spectrograms sampled from the DDPM, targeted at the two rarest classes.
+\item \textbf{classical+generative}: stack of the above.
+\end{itemize}
+
+\subsection{Innovation}
+We treat generative augmentation as a \emph{fairness intervention}, not a regularizer. Synthetic samples are added only to the rarest classes, the headline metric is rare-class recall (not macro-F1), and we publish a per-class FNR table alongside aggregate metrics. The same diffusion model that generates training samples also enables the sample-quality diagnostics described in Section~\ref{sec:expts}.
+
+\section{Experiments and Results}\label{sec:expts}
+
+\subsection{Baselines establish the rare-class failure mode}
+Table~\ref{tab:baselines} reports the two baselines on the donateacry test split (seed=0, 30 epochs). Both achieve 84.1\% accuracy by trivially predicting \textit{hungry} and report zero recall on \textit{belly\_pain} and \textit{burping}. Macro-F1 is correspondingly stuck at $\approx$0.18. The aggregate accuracy is misleading; in a clinical-adjacent product this would be an actively dangerous failure mode (Section~\ref{sec:ethics}).
+
+\begin{table}[H]
+\centering
+\caption{Phase 1 baselines (seed=0). Both collapse to the majority class.}\label{tab:baselines}
+\begin{tabular}{lcccccc}
+\toprule
+Augmentation & macro-F1 & accuracy & belly\_pain rec. & burping rec. & ECE \\
+\midrule
+none      & 0.183 & 0.841 & 0.00 & 0.00 & 0.48 \\
+classical & 0.183 & 0.841 & 0.00 & 0.00 & 0.51 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sample-quality diagnostic}
+Before training the augmented classifier, we run a cheap \emph{class-consistency probe}: the naive baseline (which always predicts \textit{hungry} on real test inputs) is run on the synthetic samples. If the synthetic samples carry a class signal that is at all distinct from \textit{hungry}, the probe should at least sometimes break character. After 30 DDPM epochs, the probe classifies 51\% of synthetic \textit{belly\_pain} samples as \textit{belly\_pain} but only 0\% of synthetic \textit{burping} samples as \textit{burping}. We interpret this as evidence that the DDPM had enough training signal for \textit{belly\_pain} (11 real clips) but not yet for \textit{burping} (6 real clips). This finding alone is informative for downstream design: in low-data regimes, generative augmentation is gated by class-conditional learnability, not just by aggregate sample count. \emph{(Numbers update after the 150-epoch DDPM completes.)}
+
+\subsection{Augmentation matrix} \emph{(populated after the experiment matrix run.)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/real_vs_synth_30ep.png}
+\caption{Real vs.\ synthetic log-mel spectrograms for the two rarest classes (30-epoch DDPM checkpoint). Real samples (top row of each pair) show distinct harmonic structure; synthetic samples (bottom row) reproduce the broad envelope but, for \textit{burping}, lack class-distinct fine structure. This is consistent with the probe finding in the previous subsection.}
+\label{fig:realvssynth}
+\end{figure}
+
+\section{Ethics and Limitations}\label{sec:ethics}
+This project is framed as a research artifact, not as a clinical-grade product. The accompanying datasheet and model card document data provenance, class imbalance, missing demographic annotations, and out-of-scope uses. Per-class false-negative rate (especially on \textit{belly\_pain}) is reported alongside aggregate metrics in every table. A more detailed ethics review is available in the project repository under \texttt{ethics/} and \texttt{reading\_hw/ethics\_essay.pdf}.
+
+The principal limitations are: (i) \textit{burping} has only 6 training clips and 1 test clip, so any single-seed result on this class is statistically fragile; we report multi-seed CIs and flag the cell explicitly. (ii) donateacry-corpus skews toward English-speaking, smartphone-equipped households; the cross-source held-out evaluation we describe is a proxy for population shift, not a substitute for it. (iii) Our DDPM is small (3.8M parameters) and trained on 320 clips; sample fidelity is correspondingly limited and we do not claim it produces clinically realistic cries. (iv) Even with synthetic augmentation, deployment of an infant-cry classifier as a parental notification system would require a clinical validation that this study does not provide.
+
+\section{Conclusion and Future Work}\label{sec:concl}
+We set up a controlled, fully reproducible study of class-conditional generative augmentation as a fairness intervention for rare-class infant cry classification. The naive log-mel CNN baseline, even with classical SpecAugment, completely fails on the two rarest classes despite high aggregate accuracy. This is the empirical motivation for the project. We then trained a small class-conditional DDPM and showed via a cheap class-consistency probe that learnability is class-dependent in the low-data regime: the model captures \textit{belly\_pain} but not \textit{burping} at 30 epochs. \emph{(Final results, including the multi-seed augmentation matrix and a noise-robustness ablation, are inserted from \texttt{results/matrix.csv} once the longer DDPM training completes.)}
+
+For follow-up work, the most useful direction is bringing in a second public infant-cry corpus to enable a direct cross-source robustness audit. This would convert our current cross-source-as-proxy fairness story into a direct one, and would also give the diffusion model more training signal in the rare classes.
+
+\small
+\bibliographystyle{plainnat}
+\bibliography{Report}
+
+\end{document}

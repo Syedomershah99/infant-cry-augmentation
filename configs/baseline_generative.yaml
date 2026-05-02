@@ -33,9 +33,13 @@ specaug:
   time_shift_frac: 0.1
   apply_prob: 0.8
 
+# With ~110 synthetic rare-class samples per class, the imbalance after augmentation
+# is mild enough that a balanced sampler is the right knob (it failed before because
+# rare classes had only 11 / 6 unique sources). Class-weighted loss is OFF here to
+# avoid double-counting; sampler is doing the rebalancing.
 class_weight_scheme: inverse_sqrt
-use_class_weighted_loss: true
-balanced_sampler: false
+use_class_weighted_loss: false
+balanced_sampler: true
 
 base_channels: 32
 dropout: 0.2
