@@ -31,6 +31,7 @@ from src.audio.features import FeatureConfig
 from src.eval.fairness import safety_summary
 from src.eval.metrics import evaluate
 from src.models.classifier import CryCNN, count_params
+from src.training.loss import make_loss
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -133,11 +134,7 @@ def train(cfg: dict) -> dict:
     ).to(device)
     print(f"[model] CryCNN  params={count_params(model):,}")
 
-    use_class_weight = cfg.get("use_class_weighted_loss", True)
-    criterion = nn.CrossEntropyLoss(
-        weight=class_w.to(device) if use_class_weight else None,
-        label_smoothing=cfg.get("label_smoothing", 0.0),
-    )
+    criterion = make_loss(cfg, class_w.to(device))
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=cfg.get("lr", 1e-3),

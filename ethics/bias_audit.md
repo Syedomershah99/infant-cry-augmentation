@@ -2,6 +2,19 @@
 
 > **Status:** scaffolded. Will be filled in after EDA (Phase 0) and updated at each milestone.
 
+## Second-corpus integration and a data-quality finding
+
+We integrated the public *Donate-A-Cry-Augmented* corpus on Kaggle to address the burping rare-class shortage (only 6 clips in donateacry train). On md5-content comparison we found that:
+
+- The Kaggle `hungry` class is byte-identical to donateacry `hungry` (382 / 382).
+- For each Kaggle rare class, only a fraction of clips are truly new content; the rest are duplicates of donateacry clips, **including duplicates labeled with a different class**. Specifically: 73 of 118 Kaggle "burping" clips are byte-identical to donateacry clips of other classes (mostly `hungry`); 66 / 127 belly_pain, 103 / 136 tired, 103 / 138 discomfort.
+
+Mislabeled duplicates are filtered out by the manifest builder at build time. Only clips whose md5 does not appear anywhere in donateacry (any class) are added to the training pool. Final unique additions: 41 belly_pain, 37 burping, 3 discomfort, 4 tired, 0 hungry (85 total). After integration, the training pool grows from 320 to 405 clips and rare-class train counts grow from {belly_pain: 11, burping: 6} to {belly_pain: 52, burping: 43}.
+
+Validation and test splits remain donateacry-real-only, so all reported metrics are still measured on the original held-out distribution.
+
+This data-quality issue with the Kaggle redistribution is itself a fairness-relevant finding: a deployed model trained naively on the Kaggle CSV labels would learn a correlation between the burping label and what is acoustically a hungry cry. Safety-critical class labels in public corpora warrant content-level deduplication before use.
+
 ## Audited slices
 
 | Slice | Why it matters | Where reported |

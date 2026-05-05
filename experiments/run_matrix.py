@@ -33,6 +33,7 @@ REPO = Path(__file__).resolve().parents[1]
 @dataclass(frozen=True)
 class Cell:
     aug_type: str       # none | classical | generative | classical+generative
+    recipe: str         # weighted_ce | balanced | focal
     synth_ratio: int    # multiplier for rare-class synth (used to subset synth manifest)
     seed: int
     epochs: int
@@ -40,7 +41,7 @@ class Cell:
 
     @property
     def name(self) -> str:
-        return f"{self.aug_type.replace('+','-')}_r{self.synth_ratio}_s{self.seed}"
+        return f"{self.aug_type.replace('+','-')}_{self.recipe}_r{self.synth_ratio}_s{self.seed}"
 
 
 CONFIG_BY_AUG = {
@@ -48,6 +49,28 @@ CONFIG_BY_AUG = {
     "classical": "configs/baseline_classical.yaml",
     "generative": "configs/baseline_generative.yaml",
     "classical+generative": "configs/baseline_classical_generative.yaml",
+}
+
+# Optimizer-recipe overrides applied on top of the per-arm config.
+# weighted_ce is the project's default; balanced + focal are the orthogonal
+# axes referenced as future work in the v0.3 report. They share aug_type and
+# data manifests, so any difference between cells is the recipe.
+RECIPE_OVERRIDES = {
+    "weighted_ce": {
+        "use_class_weighted_loss": True,
+        "balanced_sampler": False,
+        "loss": {"type": "ce"},
+    },
+    "balanced": {
+        "use_class_weighted_loss": False,
+        "balanced_sampler": True,
+        "loss": {"type": "ce"},
+    },
+    "focal": {
+        "use_class_weighted_loss": True,
+        "balanced_sampler": False,
+        "loss": {"type": "focal", "gamma": 2.0},
+    },
 }
 
 
@@ -101,6 +124,11 @@ def make_cell_config(cell: Cell, base_config_path: Path, synth_manifest: Path | 
     cfg["seed"] = cell.seed
     cfg["epochs"] = cell.epochs
     cfg["out_dir"] = str(cell.out_dir)
+    # Apply recipe overrides last so they win over the base config.
+    overrides = RECIPE_OVERRIDES.get(cell.recipe)
+    if overrides is None:
+        raise ValueError(f"unknown recipe: {cell.recipe}")
+    cfg.update(overrides)
     if "generative" in cell.aug_type and synth_manifest is not None:
         cfg["synth_manifest"] = str(synth_manifest)
     cell.out_dir.mkdir(parents=True, exist_ok=True)
@@ -151,6 +179,7 @@ def run_cell(cell: Cell) -> dict:
     return {
         "cell": cell.name,
         "aug_type": cell.aug_type,
+        "recipe": cell.recipe,
         "synth_ratio": cell.synth_ratio,
         "seed": cell.seed,
         "macro_f1": round(test["macro_f1"], 4),
@@ -172,6 +201,8 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--out", type=Path, default=REPO / "results" / "matrix.csv")
     p.add_argument("--aug_types", nargs="+", default=["none", "classical", "generative", "classical+generative"])
+    p.add_argument("--recipes", nargs="+", default=["weighted_ce", "balanced", "focal"],
+                   choices=list(RECIPE_OVERRIDES.keys()))
     p.add_argument("--ratios", nargs="+", type=int, default=[0, 1, 5, 10],
                    help="Synth-to-real ratios for rare classes; ignored for non-generative arms.")
     p.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
@@ -188,13 +219,14 @@ def main() -> None:
     for aug in args.aug_types:
         # Non-generative arms have no ratio dimension; collapse to one value.
         ratios = args.ratios if "generative" in aug else [0]
-        for ratio, seed in itertools.product(ratios, args.seeds):
+        for recipe, ratio, seed in itertools.product(args.recipes, ratios, args.seeds):
             cell = Cell(
                 aug_type=aug,
+                recipe=recipe,
                 synth_ratio=ratio,
                 seed=seed,
                 epochs=args.epochs,
-                out_dir=args.results_root / f"{aug.replace('+','-')}_r{ratio}_s{seed}",
+                out_dir=args.results_root / f"{aug.replace('+','-')}_{recipe}_r{ratio}_s{seed}",
             )
             row = run_cell(cell)
             print(f"[matrix] {row}")
