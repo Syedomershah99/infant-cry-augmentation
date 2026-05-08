@@ -2,23 +2,21 @@
 
 For each upstream data source, this file records the provenance and the consent basis under which clips are used in this project.
 
-> **Status:** scaffolded. Will be populated as sources are pulled in Phase 0.
-
 ## Per-source records
 
 ### donateacry-corpus
 - **Origin:** community-uploaded corpus aggregated at <https://github.com/gveres/donateacry-corpus>.
 - **Upstream license:** MIT (corpus repository).
 - **Consent basis:** parents/caregivers voluntarily uploaded clips through the original Donate-A-Cry application; the corpus is published as a public research dataset.
-- **Use in this project:** training, validation, test, and conditional fine-tuning of the diffusion model.
+- **Use in this project:** training (267 hungry + 53 rare-class clips), validation (68 clips), test (69 clips), and class-conditional fine-tuning of the diffusion model.
 - **Redistribution in this repo:** **none.** Manifests only; clips fetched from upstream.
 
-### Cross-source corpus(es) — TBD
-- **Origin:** _(filled per source as added — Kaggle / Zenodo)_
-- **Upstream license:** _(must be CC-BY or compatible; non-commercial sources flagged below)_
-- **Consent basis:** _(quoted from upstream source's documentation)_
-- **Use:** cross-source held-out test only, and unconditional diffusion pretraining.
-- **Redistribution in this repo:** **none.**
+### Donate-A-Cry-Augmented (Kaggle)
+- **Origin:** Kaggle redistribution of donateacry-corpus with programmatic augmentations of rare-class clips. Downloaded by the user as `archive.zip` and unzipped under `data/raw/kaggle_archive/`.
+- **Upstream consent basis:** the Kaggle redistribution inherits the donateacry consent basis (parents/caregivers who voluntarily uploaded to the original Donate-A-Cry application).
+- **Use in this project:** only clips whose md5 content hash is **not** present anywhere in the donateacry corpus are retained, and they are added exclusively to the train split. The 0 hungry / 41 belly_pain / 37 burping / 3 discomfort / 4 tired = 85 unique clips supplement the train pool from 320 to 405. Validation and test remain donateacry-real-only.
+- **Data-quality flag:** before content deduplication, 73 / 118 burping clips, 66 / 127 belly_pain clips, 103 / 136 tired clips, and 103 / 138 discomfort clips in this redistribution were byte-identical to donateacry clips of *other* (mostly hungry) classes. We treat this as label noise rather than as new content, and document it as a fairness-relevant finding in `bias_audit.md`.
+- **Redistribution in this repo:** **none.** Manifests only; clips fetched from the upstream Kaggle source.
 
 ### MUSAN babble subset (noise robustness)
 - **Origin:** <https://www.openslr.org/17/>

@@ -1,7 +1,5 @@
 # Bias Audit
 
-> **Status:** scaffolded. Will be filled in after EDA (Phase 0) and updated at each milestone.
-
 ## Second-corpus integration and a data-quality finding
 
 We integrated the public *Donate-A-Cry-Augmented* corpus on Kaggle to address the burping rare-class shortage (only 6 clips in donateacry train). On md5-content comparison we found that:

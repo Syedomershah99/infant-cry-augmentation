@@ -2,8 +2,6 @@
 
 Following the framework of *Gebru et al., "Datasheets for Datasets" (2018)*. This datasheet covers the **derived** dataset used in this project (manifests + splits over public sources), not the original corpora — see each source's own datasheet/README for upstream details.
 
-> **Status:** scaffolded. Numeric fields will be populated after `data/manifests/` is built and before `v0.1-baseline`.
-
 ## Motivation
 
 - **For what purpose was the dataset created?** To enable a controlled study of class-conditional generative augmentation for severely class-imbalanced infant cry classification, with explicit fairness/robustness reporting on rare classes.
@@ -12,8 +10,8 @@ Following the framework of *Gebru et al., "Datasheets for Datasets" (2018)*. Thi
 
 ## Composition
 
-- **What do the instances represent?** Short audio clips of infant cries, with one of five class labels (belly_pain, burping, discomfust, hungry, tired) plus source and split metadata.
-- **How many instances?** _(TBD after manifest build)_
+- **What do the instances represent?** Short audio clips of infant cries, with one of five class labels (belly_pain, burping, discomfort, hungry, tired) plus source and split metadata.
+- **How many instances?** 542 unique clips total in the merged corpus: 457 from donateacry-corpus + 85 content-unique additions from the Donate-A-Cry-Augmented Kaggle redistribution. Train pool: 405 (267 hungry, 52 belly_pain, 43 burping, 22 discomfort, 21 tired). Val: 68 (donateacry-real only). Test: 69 (donateacry-real only). 285 synthetic spectrograms (156 belly_pain, 129 burping) sampled from the trained DDPM are stored under `data/synth/` (gitignored) for the augmentation arms.
 - **What data does each instance consist of?** Raw audio file (downloaded separately, not redistributed in this repo) + a row in a manifest CSV.
 - **Is there a label or target?** Yes — categorical class label inherited from the upstream source.
 - **Are relationships between instances made explicit?** Yes — `source` and `split` columns; cross-source held-out split is preserved.

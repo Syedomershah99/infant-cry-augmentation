@@ -2,13 +2,11 @@
 
 Following *Mitchell et al., "Model Cards for Model Reporting" (2019)*.
 
-> **Status:** scaffolded. Metric fields will be populated at `v0.1-baseline` and refined through `v0.3-results`.
-
 ## Model details
 
-- **Person/org developing the model:** Syed Omer Shah, UB CSE 4/555 final project, Spring 2026.
-- **Model date:** _(to be set at v1.0)_
-- **Model version:** _(milestone tag)_
+- **Person/org developing the model:** Syed Omer Shah and Collin Murphy, Group 14, UB CSE 4/555 final project, Spring 2026.
+- **Model date:** May 2026.
+- **Model version:** v1.0-submission (best cell: `generative + weighted_ce`, seed=0).
 - **Model type:** Audio classifier — log-mel CNN baseline, optionally a fine-tuned Audio Spectrogram Transformer (AST) or PANNs CNN14. Augmented variants additionally use a class-conditional DDPM for synthetic spectrogram generation.
 - **License:** MIT (code).
 - **Citation:** see repo `README.md`.

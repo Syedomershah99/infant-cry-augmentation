@@ -11,16 +11,19 @@
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{float}
+% Tighten float spacing so wide tables / figures do not orphan whitespace
+\setlength{\textfloatsep}{6pt plus 1pt minus 1pt}
+\setlength{\floatsep}{6pt plus 1pt minus 1pt}
+\setlength{\intextsep}{6pt plus 1pt minus 1pt}
 
 \title{Class-Conditional Generative Augmentation for Rare-Class Infant Cry Classification}
 
 \author{
-  Syed Omer Shah \and Collin Murphy \\
+  Syed Omer Shah \quad Collin Murphy \\
   Group \#: 14 \\
-  Department of Computer Science and Engineering\\
-  University at Buffalo\\
-  Buffalo, NY 14260 \\
-  \texttt{\{syedomer, cjm72\}@buffalo.edu} \\
+  Department of Computer Science and Engineering \\
+  University at Buffalo, Buffalo, NY 14260 \\
+  \texttt{\{syedomer, cjm72\}@buffalo.edu}
 }
 
 \begin{document}
@@ -94,9 +97,15 @@ Training the DDPM on the smaller, donateacry-only train pool (11 belly\_pain, 6 
 \subsection{Augmentation $\times$ recipe matrix}\label{sec:matrix}
 Table~\ref{tab:matrix} reports the per-arm, per-recipe means over three seeds at synth-to-real ratio 3$\times$ for the generative arms. Per-cell numbers, including standard deviations across seeds, are in \texttt{results/matrix\_summary.csv} in the project repository.
 
-\begin{table}[H]
+\paragraph{Reading the matrix.} Three observations stand out.
+\textbf{(a) Generative augmentation is the only intervention that recovers \textit{burping}.} Three of the four generative cells produce a non-zero \textit{burping} recall, with \textit{generative + weighted\_ce} catching the test \textit{burping} clip on 2 of 3 seeds (mean recall 0.667). No non-generative cell produced any \textit{burping} recall across 18 cells. \textbf{(b) The best macro-F1 is at \textit{generative + weighted\_ce} (0.258), a 33\% improvement over the no-augmentation baseline (0.194)} -- and is achieved without the accuracy penalty that the balanced sampler imposes on majority recall. \textbf{(c) \textit{belly\_pain} remains hard.} Only one of the 12 cells produced a non-zero mean \textit{belly\_pain} recall (\textit{none + balanced}, 0.111 = 1/3 caught). With 11 real \textit{belly\_pain} clips in train, even the v3 DDPM (probe recall 0.93 on synthetic \textit{belly\_pain}) does not push the downstream classifier across its argmax threshold under any recipe. The data scale is the binding constraint.
+
+The role of each axis decomposes cleanly. Larger train pool (320 $\to$ 405) and the kaggle deduplication raise macro-F1 from 0.18 (v0.3) to 0.19--0.21 across recipes and put the diffusion model into the regime where it can produce class-discriminative \textit{burping} samples (probe recall 0.00 $\to$ 0.08, see Section~\ref{sec:probe}). Optimizer recipe controls the safety/throughput trade-off: balanced sampler increases rare-class recall on \textit{discomfort} (0.5 mean across recipes) and \textit{belly\_pain} on at least one seed, at the cost of dropping majority-class recall by 0.3. Generative augmentation is the only intervention that flips the argmax for \textit{burping}, and it does so with \emph{no} accuracy penalty when paired with weighted CE.
+
+\begin{table}[!ht]
 \centering
-\small
+\footnotesize
+\renewcommand{\arraystretch}{0.95}
 \caption{Augmentation $\times$ optimizer recipe matrix (3 seeds per cell, 36 cells total). All numbers are means over seeds; standard deviations are in \texttt{results/matrix\_summary.csv}. Bold marks the best value within each column.}\label{tab:matrix}
 \begin{tabular}{llcccccc}
 \toprule
@@ -118,14 +127,9 @@ classical+generative & focal        & 0.182 & \textbf{0.836} & 0.000 & 0.000 & 0
 \end{tabular}
 \end{table}
 
-\paragraph{Reading the matrix.} Three observations stand out.
-\textbf{(a) Generative augmentation is the only intervention that recovers \textit{burping}.} Three of the four generative cells produce a non-zero \textit{burping} recall, with \textit{generative + weighted\_ce} catching the test \textit{burping} clip on 2 of 3 seeds (mean recall 0.667). No non-generative cell produced any \textit{burping} recall across 18 cells. \textbf{(b) The best macro-F1 is at \textit{generative + weighted\_ce} (0.258), a 33\% improvement over the no-augmentation baseline (0.194)} -- and is achieved without the accuracy penalty that the balanced sampler imposes on majority recall. \textbf{(c) \textit{belly\_pain} remains hard.} Only one of the 12 cells produced a non-zero mean \textit{belly\_pain} recall (\textit{none + balanced}, 0.111 = 1/3 caught). With 11 real \textit{belly\_pain} clips in train, even the v3 DDPM (probe recall 0.93 on synthetic \textit{belly\_pain}) does not push the downstream classifier across its argmax threshold under any recipe. The data scale is the binding constraint.
-
-The role of each axis decomposes cleanly. Larger train pool (320 $\to$ 405) and the kaggle deduplication raise macro-F1 from 0.18 (v0.3) to 0.19--0.21 across recipes and put the diffusion model into the regime where it can produce class-discriminative \textit{burping} samples (probe recall 0.00 $\to$ 0.08, see Section~\ref{sec:probe}). Optimizer recipe controls the safety/throughput trade-off: balanced sampler increases rare-class recall on \textit{discomfort} (0.5 mean across recipes) and \textit{belly\_pain} on at least one seed, at the cost of dropping majority-class recall by 0.3. Generative augmentation is the only intervention that flips the argmax for \textit{burping}, and it does so with \emph{no} accuracy penalty when paired with weighted CE.
-
-\begin{figure}[H]
+\begin{figure}[!ht]
 \centering
-\includegraphics[width=0.7\linewidth]{figures/real_vs_synth.png}
+\includegraphics[width=0.62\linewidth]{figures/real_vs_synth.png}
 \caption{Real vs.\ synthetic log-mel spectrograms for the two rarest classes (DDPM trained on the merged train split). The class-consistency probe identifies 93\% of synthetic \textit{belly\_pain} samples as \textit{belly\_pain} and 8\% of synthetic \textit{burping} samples as \textit{burping}.}
 \label{fig:realvssynth}
 \end{figure}
