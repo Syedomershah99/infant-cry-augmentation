@@ -59,7 +59,43 @@ Both naive baselines collapse to predicting the majority class (`hungry`,
 84% of test). Aggregate accuracy is misleading; per-class recall on the
 safety-critical `belly_pain` class is zero.
 
-### Augmentation matrix (4 arms × 3 seeds, synth ratio 10×, 30 epochs)
+### Final augmentation × optimizer-recipe matrix (v1.0: 4 arms × 3 recipes × 3 seeds = 36 cells)
+
+| Arm | Recipe | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE |
+|---|---|---:|---:|---:|---:|---:|
+| none | weighted_ce | 0.194 | 0.797 | 0.000 | 0.000 | 0.285 |
+| none | balanced | 0.191 | 0.507 | 0.111 | 0.000 | 0.201 |
+| none | focal | 0.213 | 0.787 | 0.000 | 0.000 | 0.354 |
+| classical | weighted_ce | 0.180 | 0.807 | 0.000 | 0.000 | 0.418 |
+| classical | balanced | 0.205 | 0.638 | 0.000 | 0.000 | 0.285 |
+| classical | focal | 0.187 | 0.778 | 0.000 | 0.000 | 0.345 |
+| **generative** | **weighted_ce** | **0.258** | **0.816** | 0.000 | **0.667** | 0.352 |
+| generative | balanced | 0.195 | 0.585 | 0.000 | 0.333 | 0.226 |
+| generative | focal | 0.238 | 0.763 | 0.000 | 0.333 | 0.333 |
+| classical+generative | weighted_ce | 0.208 | 0.792 | 0.000 | 0.333 | 0.286 |
+| classical+generative | balanced | 0.171 | 0.507 | 0.000 | 0.000 | 0.207 |
+| classical+generative | focal | 0.182 | 0.836 | 0.000 | 0.000 | 0.371 |
+
+**Recommended deployment configuration:** `generative + weighted_ce` is the
+best cell. It achieves the highest macro-F1 (0.258), the highest non-zero
+burping recall (0.667 across seeds), and preserves majority-class accuracy
+(0.816). It does NOT recover belly_pain (still 0.000), so any deployment
+should explicitly disable a "pain" alert until rare-class recall improves
+on a larger or genuinely cross-source corpus.
+
+### Sample-quality probe (DDPM v3 trained on merged train pool)
+
+| Class | n synth | probe recall | probe precision | probe F1 |
+|---|---:|---:|---:|---:|
+| belly_pain | 156 | 0.93 | 0.89 | 0.91 |
+| burping    | 129 | 0.08 | 0.77 | 0.14 |
+
+The probe's belly_pain recognition (0.93) is far above the downstream
+classifier's belly_pain recall (0.000 in all cells). This gap suggests an
+iterative refinement loop (classifier-scored sample re-training) is the most
+promising follow-up.
+
+### Earlier baselines (v0.3, donateacry-only, 4 arms × 3 seeds, 12 cells)
 
 | Arm | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE (mean) |
 |---|---:|---:|---:|---:|---:|

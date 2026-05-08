@@ -44,7 +44,41 @@ This data-quality issue with the Kaggle redistribution is itself a fairness-rele
 - Demographic features of the upstream corpora are not annotated, so direct demographic-fairness slicing is not possible.
 - Cross-source generalization is a *proxy* for demographic robustness — gaps may be due to source-specific recording conditions rather than population differences. The audit should be read as a lower bound on population-level concerns.
 
-## Numeric findings — Phase 3 augmentation matrix (4 arms × 3 seeds)
+## Numeric findings — v1.0 final matrix (36 cells: 4 aug × 3 recipes × 3 seeds)
+
+The fairness intervention works for one rare class but not the other. The best
+cell (`generative + weighted_ce`) catches the test burping clip on 2 of 3
+seeds (mean recall 0.667), and macro-F1 is 33% above baseline. No cell across
+the matrix recovers belly_pain at the argmax level, despite the diffusion
+probe identifying 93% of synthetic belly_pain as belly_pain.
+
+| Arm | Recipe | macro-F1 | belly_pain rec. | burping rec. | ECE |
+|---|---|---:|---:|---:|---:|
+| none | weighted_ce | 0.194 | 0.000 | 0.000 | 0.285 |
+| none | balanced | 0.191 | 0.111 | 0.000 | 0.201 |
+| none | focal | 0.213 | 0.000 | 0.000 | 0.354 |
+| classical | weighted_ce | 0.180 | 0.000 | 0.000 | 0.418 |
+| classical | balanced | 0.205 | 0.000 | 0.000 | 0.285 |
+| classical | focal | 0.187 | 0.000 | 0.000 | 0.345 |
+| **generative** | **weighted_ce** | **0.258** | 0.000 | **0.667** | 0.352 |
+| generative | balanced | 0.195 | 0.000 | 0.333 | 0.226 |
+| generative | focal | 0.238 | 0.000 | 0.333 | 0.333 |
+| classical+generative | weighted_ce | 0.208 | 0.000 | 0.333 | 0.286 |
+| classical+generative | balanced | 0.171 | 0.000 | 0.000 | 0.207 |
+| classical+generative | focal | 0.182 | 0.000 | 0.000 | 0.371 |
+
+**Fairness reading.** Generative augmentation succeeds where classical
+augmentation fails for the burping class (3/4 generative cells produce
+non-zero burping recall; 0/18 non-generative cells do). For belly_pain,
+no augmentation type or recipe combination recovers argmax-level recall:
+even with 52 real+synthetic training clips after the kaggle integration,
+the downstream classifier still defaults away from belly_pain on every
+test instance. The 11 real belly_pain clips are a hard floor on what
+augmentation alone can fix at this data scale, and the project's deployment
+recommendation is correspondingly to disable a "pain" alert until a third
+corpus is integrated.
+
+## Numeric findings — v0.3 baseline matrix (donateacry-only, 4 arms × 3 seeds)
 
 The full augmentation matrix at synthetic-to-real ratio 10× shows that none
 of the four arms flips the classifier's argmax on the safety-critical rare

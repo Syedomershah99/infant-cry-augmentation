@@ -102,23 +102,40 @@ python -m experiments.run_matrix --out results/matrix.csv \
     --seeds 0 1 2 --ratios 0 1 5 10 --epochs 30
 ```
 
-### Headline numbers (4 arms × 3 seeds, synth ratio 10×, 30 epochs)
+### Headline numbers (v1.0: 4 arms × 3 recipes × 3 seeds = 36 cells, synth ratio 3×, 30 epochs)
 
-| Arm | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE (mean) |
-|---|---:|---:|---:|---:|---:|
-| none                 | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
-| classical            | 0.183 | 0.841 | 0.00 | 0.00 | 0.48 |
-| generative           | 0.182 | 0.831 | 0.00 | 0.00 | **0.37** |
-| classical+generative | 0.183 | 0.841 | 0.00 | 0.00 | **0.39** |
+| Arm | Recipe | macro-F1 | accuracy | belly_pain rec. | **burping rec.** | ECE |
+|---|---|---:|---:|---:|---:|---:|
+| none | weighted_ce | 0.194 | 0.797 | 0.000 | 0.000 | 0.285 |
+| none | balanced | 0.191 | 0.507 | **0.111** | 0.000 | **0.201** |
+| none | focal | 0.213 | 0.787 | 0.000 | 0.000 | 0.354 |
+| classical | weighted_ce | 0.180 | 0.807 | 0.000 | 0.000 | 0.418 |
+| classical | balanced | 0.205 | 0.638 | 0.000 | 0.000 | 0.285 |
+| classical | focal | 0.187 | 0.778 | 0.000 | 0.000 | 0.345 |
+| **generative** | **weighted_ce** | **0.258** | **0.816** | 0.000 | **0.667** | 0.352 |
+| generative | balanced | 0.195 | 0.585 | 0.000 | 0.333 | 0.226 |
+| generative | focal | 0.238 | 0.763 | 0.000 | 0.333 | 0.333 |
+| classical+generative | weighted_ce | 0.208 | 0.792 | 0.000 | 0.333 | 0.286 |
+| classical+generative | balanced | 0.171 | 0.507 | 0.000 | 0.000 | 0.207 |
+| classical+generative | focal | 0.182 | **0.836** | 0.000 | 0.000 | 0.371 |
 
-**Reading.** The classifier collapses to "always hungry" in every cell, every
-seed. Aggregate accuracy is misleading at 84%; rare-class recall is 0.
-The single quantity generative augmentation does shift is calibration:
-ECE drops by ~10 points across seeds. The synthetic samples carry useful
-class signal (a class-consistency probe identifies 51% of synthetic
-belly_pain as belly_pain) but it is below the classifier's argmax
-threshold under class-weighted CE alone. See `report/Report.pdf` for the
-full discussion and `results/matrix.csv` for raw numbers.
+**Reading.**
+- **Generative + weighted_ce is the best cell** simultaneously on macro-F1
+  (+33% over baseline) and burping recall (0.667, vs. 0.000 across all 18
+  non-generative cells), without sacrificing accuracy.
+- **Generative augmentation is the only intervention that recovers burping**
+  — three of four generative cells produce non-zero burping recall;
+  no non-generative cell does.
+- **belly_pain remains hard at this data scale** (only 11 real training
+  clips after kaggle dedup). The DDPM produces class-discriminative samples
+  (probe recall 0.93) but the downstream classifier doesn't cross argmax.
+- **The role of each axis decomposes cleanly:** larger train pool unblocks
+  diffusion conditioning quality (probe burping recall 0.00 → 0.08); the
+  optimizer recipe controls recall-vs-accuracy trade-off; generative
+  augmentation flips the argmax for burping.
+
+See `report/Report.pdf` for the full write-up and `results/matrix_summary.csv`
+for per-cell mean+std numbers.
 
 ## Plan
 

@@ -15,12 +15,12 @@
 \title{Class-Conditional Generative Augmentation for Rare-Class Infant Cry Classification}
 
 \author{
-  Syed Omer Shah\\
-  Group \#: \emph{TBD} \\
+  Syed Omer Shah \and Collin Murphy \\
+  Group \#: 14 \\
   Department of Computer Science and Engineering\\
   University at Buffalo\\
   Buffalo, NY 14260 \\
-  \texttt{syedomer@buffalo.edu} \\
+  \texttt{\{syedomer, cjm72\}@buffalo.edu} \\
 }
 
 \begin{document}
@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Infant cry classification is a clinically-adjacent task in which the rarest classes (such as pain) are also the most safety-critical. Public corpora are heavily imbalanced; in the donateacry-corpus, \textit{hungry} accounts for 84\% of clips and \textit{burping} for 1.8\%. A naive log-mel CNN trained on this corpus achieves 84\% aggregate accuracy by collapsing onto the majority class, missing every safety-critical case. We study whether the combination of (i) class-conditional denoising diffusion for rare-class data synthesis and (ii) a small ablation over optimizer recipes (class-weighted cross-entropy, balanced sampler, focal loss) can change this. We deduplicate a second public corpus (Donate-A-Cry-Augmented) at the content level to surface a fairness-relevant data-quality issue: roughly 60\% of the Kaggle redistribution's labeled rare-class clips are byte-identical to donateacry clips of \emph{other} classes, and we filter them out. After integration, we report a controlled $4 \times 3 \times 3$-seed augmentation matrix and find that each axis -- larger train pool, optimizer recipe, and generative augmentation -- moves a different metric: the larger train pool moves macro-F1 (0.18 $\to$ 0.22), the balanced sampler moves rare-class recall (0 $\to$ 0.33 on \textit{belly\_pain}), and generative augmentation tightens calibration (ECE 0.48 $\to$ 0.08 in some cells) without flipping argmax. The project is released open source with a datasheet, model card, and pre-registered evaluation harness.
+Infant cry classification is a clinically-adjacent task in which the rarest classes (such as pain) are also the most safety-critical. Public corpora are heavily imbalanced; in the donateacry-corpus, \textit{hungry} accounts for 84\% of clips and \textit{burping} for 1.8\%. A naive log-mel CNN trained on this corpus achieves 84\% aggregate accuracy by collapsing onto the majority class, missing every safety-critical case. We study whether the combination of (i) class-conditional denoising diffusion for rare-class data synthesis and (ii) a small ablation over optimizer recipes (class-weighted cross-entropy, balanced sampler, focal loss) can change this. We deduplicate a second public corpus (Donate-A-Cry-Augmented) at the content level to surface a fairness-relevant data-quality issue: many of the Kaggle redistribution's labeled rare-class clips are byte-identical to donateacry clips of \emph{other} classes, and we filter them out. After integration, we report a controlled $4 \times 3 \times 3$-seed augmentation matrix (36 cells). The best cell, \textit{generative + weighted\_ce}, achieves macro-F1 = 0.258 (vs.\ 0.194 baseline; +33\%) and \emph{burping} recall = 0.667 (vs.\ 0 across all 18 non-generative cells), while preserving 81.6\% accuracy. \textit{belly\_pain} recall remains hard at this data scale (11 real training clips). The role of each axis decomposes cleanly: a larger train pool unblocks the diffusion model's class-conditional learning (sample-quality probe rises from 0.51 to 0.93 on \textit{belly\_pain}, 0.00 to 0.08 on \textit{burping}); generative augmentation is the only intervention that flips the argmax for \textit{burping}; the balanced sampler trades majority-class accuracy for rare-class recall. The project is released open source with a datasheet, model card, and pre-registered evaluation harness.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -97,29 +97,31 @@ Table~\ref{tab:matrix} reports the per-arm, per-recipe means over three seeds at
 \begin{table}[H]
 \centering
 \small
-\caption{Augmentation $\times$ optimizer recipe matrix (3 seeds per cell). All numbers are means over seeds. Bold indicates the best value within each column; brackets show range across seeds.}\label{tab:matrix}
+\caption{Augmentation $\times$ optimizer recipe matrix (3 seeds per cell, 36 cells total). All numbers are means over seeds; standard deviations are in \texttt{results/matrix\_summary.csv}. Bold marks the best value within each column.}\label{tab:matrix}
 \begin{tabular}{llcccccc}
 \toprule
 Arm & Recipe & macro-F1 & accuracy & belly\_pain rec. & burping rec. & ECE \\
 \midrule
-none & weighted\_ce & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-none & balanced     & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-none & focal        & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical & weighted\_ce & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical & balanced     & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical & focal        & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-generative & weighted\_ce & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-generative & balanced     & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-generative & focal        & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical+generative & weighted\_ce & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical+generative & balanced     & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
-classical+generative & focal        & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} & \textsc{TBA} \\
+none & weighted\_ce          & 0.194 & 0.797 & 0.000 & 0.000 & 0.285 \\
+none & balanced              & 0.191 & 0.507 & \textbf{0.111} & 0.000 & \textbf{0.201} \\
+none & focal                 & 0.213 & 0.787 & 0.000 & 0.000 & 0.354 \\
+classical & weighted\_ce     & 0.180 & 0.807 & 0.000 & 0.000 & 0.418 \\
+classical & balanced         & 0.205 & 0.638 & 0.000 & 0.000 & 0.285 \\
+classical & focal            & 0.187 & 0.778 & 0.000 & 0.000 & 0.345 \\
+generative & weighted\_ce    & \textbf{0.258} & 0.816 & 0.000 & \textbf{0.667} & 0.352 \\
+generative & balanced        & 0.195 & 0.585 & 0.000 & 0.333 & 0.226 \\
+generative & focal           & 0.238 & 0.763 & 0.000 & 0.333 & 0.333 \\
+classical+generative & weighted\_ce & 0.208 & 0.792 & 0.000 & 0.333 & 0.286 \\
+classical+generative & balanced     & 0.171 & 0.507 & 0.000 & 0.000 & 0.207 \\
+classical+generative & focal        & 0.182 & \textbf{0.836} & 0.000 & 0.000 & 0.371 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Reading the matrix.} Three observations emerge already from the partial run.
-\textbf{(a) Recipe matters more than augmentation type.} Within the \textit{none} arm, the balanced sampler raises mean macro-F1 from 0.193 (weighted\_ce) to over 0.20 and recovers non-zero \textit{belly\_pain} recall on at least one seed; within \textit{classical}, the same recipe difference flips \textit{tired} from 0 to 0.33 in a seed. Augmentation type alone, holding the recipe fixed, moves macro-F1 by less than the seed-to-seed range. \textbf{(b) Calibration is augmentation-driven.} ECE drops sharply with the balanced sampler (down to 0.079 in one cell) and with generative augmentation, even when argmax is unchanged. The synthetic samples therefore carry sub-argmax-threshold class signal that the model uses to hedge appropriately on its mispredictions. \textbf{(c) Per-class metrics are not interchangeable.} The cells with the highest macro-F1 are not the cells with the highest \textit{belly\_pain} recall; the safety-critical metric and the aggregate metric come apart, and the choice of headline metric is itself a fairness decision.
+\paragraph{Reading the matrix.} Three observations stand out.
+\textbf{(a) Generative augmentation is the only intervention that recovers \textit{burping}.} Three of the four generative cells produce a non-zero \textit{burping} recall, with \textit{generative + weighted\_ce} catching the test \textit{burping} clip on 2 of 3 seeds (mean recall 0.667). No non-generative cell produced any \textit{burping} recall across 18 cells. \textbf{(b) The best macro-F1 is at \textit{generative + weighted\_ce} (0.258), a 33\% improvement over the no-augmentation baseline (0.194)} -- and is achieved without the accuracy penalty that the balanced sampler imposes on majority recall. \textbf{(c) \textit{belly\_pain} remains hard.} Only one of the 12 cells produced a non-zero mean \textit{belly\_pain} recall (\textit{none + balanced}, 0.111 = 1/3 caught). With 11 real \textit{belly\_pain} clips in train, even the v3 DDPM (probe recall 0.93 on synthetic \textit{belly\_pain}) does not push the downstream classifier across its argmax threshold under any recipe. The data scale is the binding constraint.
+
+The role of each axis decomposes cleanly. Larger train pool (320 $\to$ 405) and the kaggle deduplication raise macro-F1 from 0.18 (v0.3) to 0.19--0.21 across recipes and put the diffusion model into the regime where it can produce class-discriminative \textit{burping} samples (probe recall 0.00 $\to$ 0.08, see Section~\ref{sec:probe}). Optimizer recipe controls the safety/throughput trade-off: balanced sampler increases rare-class recall on \textit{discomfort} (0.5 mean across recipes) and \textit{belly\_pain} on at least one seed, at the cost of dropping majority-class recall by 0.3. Generative augmentation is the only intervention that flips the argmax for \textit{burping}, and it does so with \emph{no} accuracy penalty when paired with weighted CE.
 
 \begin{figure}[H]
 \centering
@@ -134,9 +136,9 @@ The accompanying datasheet and model card document data provenance, class imbala
 The principal limitations are: (i) \textit{burping} has only 1 clip in val and 1 in test, so any single-seed result on this class is statistically fragile; we report multi-seed numbers throughout. (ii) Even after the kaggle integration, demographic metadata is not annotated, so direct demographic fairness audits are not possible. (iii) Our DDPM is small (3.8M parameters) and trained on 405 clips; sample fidelity is correspondingly limited. (iv) Even with synthetic augmentation, deployment of an infant-cry classifier as a parental notification system would require independent clinical validation that this study does not provide.
 
 \section{Conclusion and Future Work}\label{sec:concl}
-We set up a controlled, fully reproducible study of class-conditional generative augmentation as a fairness intervention for rare-class infant cry classification, integrated a second public corpus with explicit content-level deduplication, and ran a three-axis (4 augmentation arms $\times$ 3 optimizer recipes $\times$ 3 seeds) ablation. The headline finding is that the three axes move different parts of the system: more rare-class real data raises macro-F1 and is the only intervention that changes the diffusion model's class-conditioning quality (probe recall on \textit{belly\_pain} 0.51 $\to$ 0.93); the optimizer recipe is what turns rare-class recall non-zero (balanced sampler); and generative augmentation tightens calibration without changing argmax. None of the axes individually flips the argmax for the rarest class, \textit{burping}, at our data scale. We argue that this \emph{decomposed} reading of where each intervention helps is more useful for practitioners than a single ``does augmentation help'' yes/no.
+We set up a controlled, fully reproducible study of class-conditional generative augmentation as a fairness intervention for rare-class infant cry classification, integrated a second public corpus with explicit content-level deduplication, and ran a three-axis (4 augmentation arms $\times$ 3 optimizer recipes $\times$ 3 seeds) ablation across 36 cells. The principal positive finding is that \textit{generative + weighted\_ce} simultaneously achieves the best macro-F1 (0.258, a 33\% improvement over baseline) and the only consistently non-zero \textit{burping} recall (mean 0.667 across seeds), without the accuracy penalty that the balanced sampler imposes. \textit{belly\_pain} recall, by contrast, remains hard at this data scale: with only 11 real training clips, even our high-quality DDPM (sample-quality probe recall 0.93) does not push the downstream classifier across its argmax threshold. The roles of the three axes also decompose cleanly: more rare-class real data is the rate-limiting factor for diffusion-model conditioning quality, optimizer recipe controls the recall-vs-accuracy trade-off, and generative augmentation is the unique intervention that recovers \textit{burping}.
 
-For follow-up work, the most useful direction is bringing in a \emph{genuinely cross-source} infant-cry corpus (e.g., Baby Chillanto under DUA, or a clinical NICU recording) so that the cross-source robustness eval becomes a real distribution-shift test rather than a same-source test. A second extension is an iterative loop in which the trained classifier scores its own synthetic samples and only the high-confidence ones are kept for the next round of training; this should narrow the gap between the probe's 93\% belly\_pain recognition and the classifier's downstream rare-class recall.
+The most useful follow-up is bringing in a genuinely cross-source infant-cry corpus (e.g., Baby Chillanto under DUA, or a clinical NICU recording) so the robustness eval becomes a real distribution-shift test. A second extension is an iterative refinement loop in which the trained classifier scores its own synthetic samples and only the high-confidence ones are kept for the next training round, with the goal of closing the gap between the diffusion probe's 0.93 \textit{belly\_pain} recognition and the classifier's still-zero downstream recall.
 
 \small
 \bibliographystyle{plainnat}

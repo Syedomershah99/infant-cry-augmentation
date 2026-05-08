@@ -1,0 +1,2783 @@
+{
+  "config": {
+    "seed": 0,
+    "device": "auto",
+    "out_dir": "results/matrix/generative_balanced_r3_s0",
+    "manifests": {
+      "train": "data/manifests/train.csv",
+      "val": "data/manifests/val.csv",
+      "test": "data/manifests/test.csv"
+    },
+    "aug_type": "generative",
+    "synth_manifest": "results/matrix/generative_balanced_r3_s0/synth_subset.csv",
+    "features": {
+      "sample_rate": 16000,
+      "n_mels": 64,
+      "n_fft": 1024,
+      "hop_length": 512,
+      "f_min": 50.0,
+      "f_max": 8000.0,
+      "target_frames": 128,
+      "target_seconds": 5.0,
+      "log_offset": 1e-06
+    },
+    "specaug": {
+      "time_mask_param": 16,
+      "freq_mask_param": 8,
+      "n_time_masks": 2,
+      "n_freq_masks": 2,
+      "noise_std": 0.02,
+      "time_shift_frac": 0.1,
+      "apply_prob": 0.8
+    },
+    "class_weight_scheme": "inverse_sqrt",
+    "use_class_weighted_loss": false,
+    "balanced_sampler": true,
+    "base_channels": 32,
+    "dropout": 0.2,
+    "batch_size": 32,
+    "num_workers": 0,
+    "epochs": 30,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.05,
+    "loss": {
+      "type": "ce"
+    }
+  },
+  "best_val_macro_f1": 0.26685868586858685,
+  "test": {
+    "macro_f1": 0.2195835910121624,
+    "accuracy": 0.5362318840579711,
+    "ece": 0.28562708911688434,
+    "per_class": {
+      "belly_pain": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3,
+        "fnr": 1.0
+      },
+      "burping": {
+        "precision": 0.125,
+        "recall": 1.0,
+        "f1": 0.2222222222222222,
+        "support": 1,
+        "fnr": 0.0
+      },
+      "discomfort": {
+        "precision": 0.1111111111111111,
+        "recall": 0.5,
+        "f1": 0.1818181818181818,
+        "support": 4,
+        "fnr": 0.5
+      },
+      "hungry": {
+        "precision": 0.85,
+        "recall": 0.5862068965517241,
+        "f1": 0.6938775510204082,
+        "support": 58,
+        "fnr": 0.41379310344827586
+      },
+      "tired": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3,
+        "fnr": 1.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        1,
+        2,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        2,
+        0
+      ],
+      [
+        0,
+        6,
+        15,
+        34,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        2,
+        0
+      ]
+    ],
+    "support_total": 69,
+    "n_correct": 37,
+    "source_counts": {
+      "donateacry": 69
+    }
+  },
+  "safety": {
+    "belly_pain_recall": 0.0,
+    "belly_pain_fnr": 1.0,
+    "burping_recall": 1.0,
+    "burping_fnr": 0.0,
+    "macro_f1": 0.2195835910121624,
+    "ece": 0.28562708911688434
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3287026446798573,
+      "val": {
+        "macro_f1": 0.022641509433962263,
+        "accuracy": 0.04411764705882353,
+        "ece": 0.2719102063599755,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.061224489795918366,
+            "recall": 0.75,
+            "f1": 0.11320754716981131,
+            "support": 4,
+            "fnr": 0.25
+          },
+          "hungry": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 57,
+            "fnr": 1.0
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            40,
+            0,
+            17
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 3,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.1504094317339468,
+      "val": {
+        "macro_f1": 0.05017140552530752,
+        "accuracy": 0.07352941176470588,
+        "ece": 0.3932164004620384,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07142857142857142,
+            "recall": 0.25,
+            "f1": 0.11111111111111112,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 1.0,
+            "recall": 0.017543859649122806,
+            "f1": 0.034482758620689655,
+            "support": 57,
+            "fnr": 0.9824561403508771
+          },
+          "tired": {
+            "precision": 0.05660377358490566,
+            "recall": 0.75,
+            "f1": 0.10526315789473685,
+            "support": 4,
+            "fnr": 0.25
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            11,
+            1,
+            45
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            3
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 5,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.0682581708051155,
+      "val": {
+        "macro_f1": 0.03625730994152047,
+        "accuracy": 0.04411764705882353,
+        "ece": 0.39274100915474053,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07142857142857142,
+            "recall": 0.25,
+            "f1": 0.11111111111111112,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 57,
+            "fnr": 1.0
+          },
+          "tired": {
+            "precision": 0.03773584905660377,
+            "recall": 0.5,
+            "f1": 0.07017543859649122,
+            "support": 4,
+            "fnr": 0.5
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            10,
+            0,
+            47
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            2
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 3,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.037176049273947,
+      "val": {
+        "macro_f1": 0.04318181818181818,
+        "accuracy": 0.058823529411764705,
+        "ece": 0.366454100345864,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07142857142857142,
+            "recall": 0.5,
+            "f1": 0.125,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 57,
+            "fnr": 1.0
+          },
+          "tired": {
+            "precision": 0.05,
+            "recall": 0.5,
+            "f1": 0.09090909090909091,
+            "support": 4,
+            "fnr": 0.5
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            22,
+            0,
+            35
+          ],
+          [
+            0,
+            0,
+            2,
+            0,
+            2
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 4,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.0526228690492934,
+      "val": {
+        "macro_f1": 0.19853479853479855,
+        "accuracy": 0.47058823529411764,
+        "ece": 0.3019981949644931,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.09090909090909091,
+            "recall": 1.0,
+            "f1": 0.16666666666666669,
+            "support": 1,
+            "fnr": 0.0
+          },
+          "discomfort": {
+            "precision": 0.125,
+            "recall": 0.25,
+            "f1": 0.16666666666666666,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8823529411764706,
+            "recall": 0.5263157894736842,
+            "f1": 0.6593406593406594,
+            "support": 57,
+            "fnr": 0.47368421052631576
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            8,
+            6,
+            30,
+            13
+          ],
+          [
+            0,
+            2,
+            0,
+            2,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 32,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.0041004156720812,
+      "val": {
+        "macro_f1": 0.09705882352941178,
+        "accuracy": 0.07352941176470588,
+        "ece": 0.31624718667829743,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.14285714285714285,
+            "recall": 1.0,
+            "f1": 0.25,
+            "support": 1,
+            "fnr": 0.0
+          },
+          "discomfort": {
+            "precision": 0.06382978723404255,
+            "recall": 0.75,
+            "f1": 0.11764705882352941,
+            "support": 4,
+            "fnr": 0.25
+          },
+          "hungry": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 57,
+            "fnr": 1.0
+          },
+          "tired": {
+            "precision": 0.07692307692307693,
+            "recall": 0.25,
+            "f1": 0.11764705882352941,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            1
+          ],
+          [
+            0,
+            4,
+            43,
+            0,
+            10
+          ],
+          [
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 5,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.9568303277527077,
+      "val": {
+        "macro_f1": 0.08553897180762852,
+        "accuracy": 0.16176470588235295,
+        "ece": 0.26534367133589354,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07692307692307693,
+            "recall": 0.5,
+            "f1": 0.13333333333333336,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8,
+            "recall": 0.14035087719298245,
+            "f1": 0.23880597014925373,
+            "support": 57,
+            "fnr": 0.8596491228070176
+          },
+          "tired": {
+            "precision": 0.03125,
+            "recall": 0.25,
+            "f1": 0.05555555555555555,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            21,
+            8,
+            28
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 11,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.9324383457501729,
+      "val": {
+        "macro_f1": 0.26685868586858685,
+        "accuracy": 0.6029411764705882,
+        "ece": 0.25631976565893955,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.25,
+            "recall": 1.0,
+            "f1": 0.4,
+            "support": 1,
+            "fnr": 0.0
+          },
+          "discomfort": {
+            "precision": 0.1111111111111111,
+            "recall": 0.5,
+            "f1": 0.1818181818181818,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8636363636363636,
+            "recall": 0.6666666666666666,
+            "f1": 0.7524752475247524,
+            "support": 57,
+            "fnr": 0.3333333333333333
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            2,
+            0
+          ],
+          [
+            0,
+            2,
+            15,
+            38,
+            2
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 41,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.9558173355848892,
+      "val": {
+        "macro_f1": 0.1806159420289855,
+        "accuracy": 0.5441176470588235,
+        "ece": 0.1660141340073417,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.10526315789473684,
+            "recall": 0.5,
+            "f1": 0.17391304347826086,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8974358974358975,
+            "recall": 0.6140350877192983,
+            "f1": 0.7291666666666667,
+            "support": 57,
+            "fnr": 0.38596491228070173
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            14,
+            35,
+            7
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 37,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.9434027452399765,
+      "val": {
+        "macro_f1": 0.07289617486338798,
+        "accuracy": 0.11764705882352941,
+        "ece": 0.3668290030430345,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07692307692307693,
+            "recall": 0.5,
+            "f1": 0.13333333333333336,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 1.0,
+            "recall": 0.07017543859649122,
+            "f1": 0.13114754098360656,
+            "support": 57,
+            "fnr": 0.9298245614035088
+          },
+          "tired": {
+            "precision": 0.05555555555555555,
+            "recall": 0.5,
+            "f1": 0.09999999999999999,
+            "support": 4,
+            "fnr": 0.5
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            0,
+            2
+          ],
+          [
+            0,
+            1,
+            21,
+            4,
+            31
+          ],
+          [
+            0,
+            0,
+            2,
+            0,
+            2
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 8,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.9035019822742628,
+      "val": {
+        "macro_f1": 0.15361336946702803,
+        "accuracy": 0.36764705882352944,
+        "ece": 0.2433243244886398,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.08695652173913043,
+            "recall": 0.5,
+            "f1": 0.14814814814814817,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.88,
+            "recall": 0.38596491228070173,
+            "f1": 0.5365853658536586,
+            "support": 57,
+            "fnr": 0.6140350877192983
+          },
+          "tired": {
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            18,
+            22,
+            17
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 25,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.9331340036530426,
+      "val": {
+        "macro_f1": 0.16545454545454547,
+        "accuracy": 0.5441176470588235,
+        "ece": 0.18453945044208978,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.0625,
+            "recall": 0.25,
+            "f1": 0.1,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8571428571428571,
+            "recall": 0.631578947368421,
+            "f1": 0.7272727272727273,
+            "support": 57,
+            "fnr": 0.3684210526315789
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            12,
+            36,
+            9
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 37,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.9087424692900284,
+      "val": {
+        "macro_f1": 0.07172077922077921,
+        "accuracy": 0.1323529411764706,
+        "ece": 0.3296776462127181,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.06451612903225806,
+            "recall": 0.5,
+            "f1": 0.1142857142857143,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.6666666666666666,
+            "recall": 0.10526315789473684,
+            "f1": 0.18181818181818182,
+            "support": 57,
+            "fnr": 0.8947368421052632
+          },
+          "tired": {
+            "precision": 0.03571428571428571,
+            "recall": 0.25,
+            "f1": 0.0625,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            26,
+            6,
+            25
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 9,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.8664264948471733,
+      "val": {
+        "macro_f1": 0.10089466089466088,
+        "accuracy": 0.2647058823529412,
+        "ece": 0.34463798298555265,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.04878048780487805,
+            "recall": 0.5,
+            "f1": 0.08888888888888888,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8,
+            "recall": 0.2807017543859649,
+            "f1": 0.41558441558441556,
+            "support": 57,
+            "fnr": 0.7192982456140351
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            35,
+            16,
+            6
+          ],
+          [
+            0,
+            0,
+            2,
+            2,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 18,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.8549771473027657,
+      "val": {
+        "macro_f1": 0.132996632996633,
+        "accuracy": 0.39705882352941174,
+        "ece": 0.16020816827521608,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.043478260869565216,
+            "recall": 0.25,
+            "f1": 0.07407407407407408,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8387096774193549,
+            "recall": 0.45614035087719296,
+            "f1": 0.5909090909090909,
+            "support": 57,
+            "fnr": 0.543859649122807
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            19,
+            26,
+            12
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 27,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.8648969774660857,
+      "val": {
+        "macro_f1": 0.14147157190635454,
+        "accuracy": 0.4411764705882353,
+        "ece": 0.10532073369797539,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.045454545454545456,
+            "recall": 0.25,
+            "f1": 0.07692307692307693,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8285714285714286,
+            "recall": 0.5087719298245614,
+            "f1": 0.6304347826086958,
+            "support": 57,
+            "fnr": 0.49122807017543857
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            18,
+            29,
+            10
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 30,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.7807040224904599,
+      "val": {
+        "macro_f1": 0.18836672068406718,
+        "accuracy": 0.5294117647058824,
+        "ece": 0.18477772220092664,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.1111111111111111,
+            "recall": 0.25,
+            "f1": 0.15384615384615383,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.85,
+            "recall": 0.5964912280701754,
+            "f1": 0.7010309278350515,
+            "support": 57,
+            "fnr": 0.40350877192982454
+          },
+          "tired": {
+            "precision": 0.05263157894736842,
+            "recall": 0.25,
+            "f1": 0.08695652173913043,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            6,
+            34,
+            17
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 36,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.828904720665752,
+      "val": {
+        "macro_f1": 0.16550607287449393,
+        "accuracy": 0.4852941176470588,
+        "ece": 0.18343080448753696,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.1111111111111111,
+            "recall": 0.25,
+            "f1": 0.15384615384615383,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8421052631578947,
+            "recall": 0.5614035087719298,
+            "f1": 0.6736842105263158,
+            "support": 57,
+            "fnr": 0.43859649122807015
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            1,
+            5,
+            32,
+            19
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 33,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.8031128143918687,
+      "val": {
+        "macro_f1": 0.12098765432098765,
+        "accuracy": 0.3235294117647059,
+        "ece": 0.18644773215055468,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.0625,
+            "recall": 0.5,
+            "f1": 0.1111111111111111,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8333333333333334,
+            "recall": 0.3508771929824561,
+            "f1": 0.4938271604938272,
+            "support": 57,
+            "fnr": 0.6491228070175439
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            27,
+            20,
+            10
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 22,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.7381504653156667,
+      "val": {
+        "macro_f1": 0.1943298969072165,
+        "accuracy": 0.5441176470588235,
+        "ece": 0.13044491892351825,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.875,
+            "recall": 0.6140350877192983,
+            "f1": 0.7216494845360825,
+            "support": 57,
+            "fnr": 0.38596491228070173
+          },
+          "tired": {
+            "precision": 0.125,
+            "recall": 0.25,
+            "f1": 0.16666666666666666,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            16,
+            35,
+            6
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 37,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.7125881091408107,
+      "val": {
+        "macro_f1": 0.1900441826215022,
+        "accuracy": 0.5441176470588235,
+        "ece": 0.1500729988603031,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.058823529411764705,
+            "recall": 0.25,
+            "f1": 0.09523809523809523,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.875,
+            "recall": 0.6140350877192983,
+            "f1": 0.7216494845360825,
+            "support": 57,
+            "fnr": 0.38596491228070173
+          },
+          "tired": {
+            "precision": 0.09090909090909091,
+            "recall": 0.25,
+            "f1": 0.13333333333333333,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            13,
+            35,
+            9
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 37,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.7478431155716163,
+      "val": {
+        "macro_f1": 0.1343915343915344,
+        "accuracy": 0.35294117647058826,
+        "ece": 0.18371920506743825,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.08695652173913043,
+            "recall": 0.5,
+            "f1": 0.14814814814814817,
+            "support": 4,
+            "fnr": 0.5
+          },
+          "hungry": {
+            "precision": 0.8148148148148148,
+            "recall": 0.38596491228070173,
+            "f1": 0.5238095238095238,
+            "support": 57,
+            "fnr": 0.6140350877192983
+          },
+          "tired": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 4,
+            "fnr": 1.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            18,
+            22,
+            17
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 24,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.7763950472292693,
+      "val": {
+        "macro_f1": 0.18116959064327487,
+        "accuracy": 0.5147058823529411,
+        "ece": 0.05999865952660058,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.0625,
+            "recall": 0.25,
+            "f1": 0.1,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.868421052631579,
+            "recall": 0.5789473684210527,
+            "f1": 0.6947368421052632,
+            "support": 57,
+            "fnr": 0.42105263157894735
+          },
+          "tired": {
+            "precision": 0.07142857142857142,
+            "recall": 0.25,
+            "f1": 0.11111111111111112,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            12,
+            33,
+            12
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 35,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.7403650641441345,
+      "val": {
+        "macro_f1": 0.1807748538011696,
+        "accuracy": 0.5147058823529411,
+        "ece": 0.07586212193264681,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.07142857142857142,
+            "recall": 0.25,
+            "f1": 0.11111111111111112,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8461538461538461,
+            "recall": 0.5789473684210527,
+            "f1": 0.6875,
+            "support": 57,
+            "fnr": 0.42105263157894735
+          },
+          "tired": {
+            "precision": 0.06666666666666667,
+            "recall": 0.25,
+            "f1": 0.10526315789473685,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            11,
+            33,
+            13
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 35,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.6961497472680134,
+      "val": {
+        "macro_f1": 0.21263726372637265,
+        "accuracy": 0.6029411764705882,
+        "ece": 0.08860113953842837,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05555555555555555,
+            "recall": 0.25,
+            "f1": 0.0909090909090909,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8863636363636364,
+            "recall": 0.6842105263157895,
+            "f1": 0.7722772277227723,
+            "support": 57,
+            "fnr": 0.3157894736842105
+          },
+          "tired": {
+            "precision": 0.16666666666666666,
+            "recall": 0.25,
+            "f1": 0.2,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            14,
+            39,
+            4
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 41,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.7292704367983168,
+      "val": {
+        "macro_f1": 0.18571428571428572,
+        "accuracy": 0.5294117647058824,
+        "ece": 0.16871571102563074,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.058823529411764705,
+            "recall": 0.25,
+            "f1": 0.09523809523809523,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8717948717948718,
+            "recall": 0.5964912280701754,
+            "f1": 0.7083333333333334,
+            "support": 57,
+            "fnr": 0.40350877192982454
+          },
+          "tired": {
+            "precision": 0.08333333333333333,
+            "recall": 0.25,
+            "f1": 0.125,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            13,
+            34,
+            10
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 36,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.6813929585443027,
+      "val": {
+        "macro_f1": 0.17856151711378354,
+        "accuracy": 0.5,
+        "ece": 0.11426842431811726,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05263157894736842,
+            "recall": 0.25,
+            "f1": 0.08695652173913043,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8648648648648649,
+            "recall": 0.5614035087719298,
+            "f1": 0.6808510638297872,
+            "support": 57,
+            "fnr": 0.43859649122807015
+          },
+          "tired": {
+            "precision": 0.08333333333333333,
+            "recall": 0.25,
+            "f1": 0.125,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            15,
+            32,
+            10
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 34,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.6993827571039615,
+      "val": {
+        "macro_f1": 0.17950354609929078,
+        "accuracy": 0.5,
+        "ece": 0.0552521378678434,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8648648648648649,
+            "recall": 0.5614035087719298,
+            "f1": 0.6808510638297872,
+            "support": 57,
+            "fnr": 0.43859649122807015
+          },
+          "tired": {
+            "precision": 0.09090909090909091,
+            "recall": 0.25,
+            "f1": 0.13333333333333333,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            16,
+            32,
+            9
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 34,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.7037954796915469,
+      "val": {
+        "macro_f1": 0.17856151711378354,
+        "accuracy": 0.5,
+        "ece": 0.09921640201526531,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05263157894736842,
+            "recall": 0.25,
+            "f1": 0.08695652173913043,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8648648648648649,
+            "recall": 0.5614035087719298,
+            "f1": 0.6808510638297872,
+            "support": 57,
+            "fnr": 0.43859649122807015
+          },
+          "tired": {
+            "precision": 0.08333333333333333,
+            "recall": 0.25,
+            "f1": 0.125,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            15,
+            32,
+            10
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 34,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.7084810087646263,
+      "val": {
+        "macro_f1": 0.17950354609929078,
+        "accuracy": 0.5,
+        "ece": 0.11302280732814005,
+        "per_class": {
+          "belly_pain": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 2,
+            "fnr": 1.0
+          },
+          "burping": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1,
+            "fnr": 1.0
+          },
+          "discomfort": {
+            "precision": 0.05,
+            "recall": 0.25,
+            "f1": 0.08333333333333334,
+            "support": 4,
+            "fnr": 0.75
+          },
+          "hungry": {
+            "precision": 0.8648648648648649,
+            "recall": 0.5614035087719298,
+            "f1": 0.6808510638297872,
+            "support": 57,
+            "fnr": 0.43859649122807015
+          },
+          "tired": {
+            "precision": 0.09090909090909091,
+            "recall": 0.25,
+            "f1": 0.13333333333333333,
+            "support": 4,
+            "fnr": 0.75
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            16,
+            32,
+            9
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "support_total": 68,
+        "n_correct": 34,
+        "source_counts": {
+          "donateacry": 68
+        }
+      }
+    }
+  ]
+}
