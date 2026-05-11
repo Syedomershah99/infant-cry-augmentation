@@ -129,6 +129,17 @@ classical+generative & focal        & 0.182 & \textbf{0.836} & 0.000 & 0.000 & 0
 
 \begin{figure}[!ht]
 \centering
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/confusion_baseline.png}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/confusion_generative.png}
+\end{minipage}
+\caption{Confusion matrices on the donateacry test split. Left: baseline (\textit{none + weighted\_ce}, seed 0) -- the model predicts \textit{hungry} for every test instance, including all rare-class cases. Right: best cell (\textit{generative + weighted\_ce}, seed 2) -- the model now distributes predictions, correctly recovers the single test \textit{burping} clip, and partially recovers \textit{discomfort} and \textit{tired}.}\label{fig:confusion}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
 \includegraphics[width=0.62\linewidth]{figures/real_vs_synth.png}
 \caption{Real vs.\ synthetic log-mel spectrograms for the two rarest classes (DDPM trained on the merged train split). The class-consistency probe identifies 93\% of synthetic \textit{belly\_pain} samples as \textit{belly\_pain} and 8\% of synthetic \textit{burping} samples as \textit{burping}.}
 \label{fig:realvssynth}
