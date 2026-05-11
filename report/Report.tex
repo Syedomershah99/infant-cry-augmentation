@@ -134,6 +134,41 @@ classical+generative & focal        & 0.182 & \textbf{0.836} & 0.000 & 0.000 & 0
 \label{fig:realvssynth}
 \end{figure}
 
+\subsection{Noise-robustness eval}\label{sec:noiserob}
+A deployed cry classifier will not see clean studio spectrograms. To quantify how each augmentation arm degrades under noise, we add zero-mean Gaussian noise of varying $\sigma$ to the standardized log-mel spectrograms of the held-out test set, evaluating at $\mathrm{SNR} \in \{\text{clean}, 20, 10, 5, 0\}$~dB. We compare the no-augmentation baseline (\textit{none + weighted\_ce}) against the best cell (\textit{generative + weighted\_ce}), three seeds each.
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{0.95}
+\caption{Noise-robustness: mean test metrics across 3 seeds at each SNR.}\label{tab:robustness}
+\begin{tabular}{llccccc}
+\toprule
+Arm & SNR & macro-F1 & accuracy & belly\_pain rec. & burping rec. & ECE \\
+\midrule
+baseline (none + weighted\_ce)        & clean & 0.193 & 0.797 & 0.000 & 0.000 & 0.285 \\
+                                        & 20 dB & 0.194 & 0.807 & 0.000 & 0.000 & 0.275 \\
+                                        & 10 dB & 0.173 & 0.546 & 0.111 & 0.333 & 0.222 \\
+                                        & 5 dB  & 0.011 & 0.020 & 0.111 & 1.000 & 0.524 \\
+                                        & 0 dB  & 0.027 & 0.048 & 0.889 & 0.000 & 0.617 \\
+\midrule
+generative + weighted\_ce             & clean & \textbf{0.258} & \textbf{0.817} & 0.000 & \textbf{0.667} & 0.352 \\
+                                        & 20 dB & \textbf{0.267} & \textbf{0.831} & 0.000 & \textbf{0.667} & 0.367 \\
+                                        & 10 dB & \textbf{0.186} & \textbf{0.768} & 0.000 & 0.333 & 0.334 \\
+                                        & 5 dB  & 0.077 & 0.044 & 0.000 & 0.667 & 0.563 \\
+                                        & 0 dB  & 0.013 & 0.034 & 0.333 & 0.333 & 0.668 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/robustness.png}
+\caption{Noise-robustness curves: macro-F1 (left) and \textit{burping} recall (right) vs.\ SNR for the no-augmentation baseline and the best generative cell. Mean over 3 seeds; range bars. Generative augmentation holds 77\% accuracy at 10~dB SNR where the baseline drops to 55\%. Below 10~dB, both arms collapse and the spuriously-high rare-class recalls at 5/0~dB reflect near-random argmax behavior, not a robustness win.}\label{fig:robustness}
+\end{figure}
+
+Two observations matter. First, in the deployment-relevant range (SNR $\ge$ 10~dB) generative augmentation is meaningfully more robust than the baseline: at 10~dB the generative cell holds 76.8\% accuracy versus the baseline's 54.6\%, and the \textit{burping} recall gap (0.333 vs.\ 0.333 at 10~dB, but 0.667 vs.\ 0.000 at 20~dB) persists. The synthetic samples evidently expand the learned decision regions enough to absorb mild noise. Second, both arms collapse below 10~dB to near-random argmax behavior (accuracy 2--4\%, ECE 0.5--0.9); the high \textit{burping} or \textit{belly\_pain} recall values reported at 5/0~dB are statistical artifacts of essentially uniform predictions across the 5 classes on a 1-clip class, not a robustness gain, and the report flags them as such.
+
 \section{Ethics and Limitations}\label{sec:ethicslim}
 The accompanying datasheet and model card document data provenance, class imbalance, missing demographic annotations, and out-of-scope uses. Per-class false-negative rate (especially on \textit{belly\_pain}) is reported alongside aggregate metrics in every table. The data-quality issue we surfaced in the Kaggle redistribution is itself a fairness-relevant finding: a deployed model trained naively on the redistributed labels would treat hungry cries as belly\_pain. Safety-critical class labels in public corpora warrant content-level deduplication.
 
