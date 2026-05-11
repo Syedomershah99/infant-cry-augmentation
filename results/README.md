@@ -30,6 +30,34 @@ safety summary (belly_pain FNR, burping FNR, ECE).
 python -c "import json; r=json.load(open('results/baseline_seed0/result.json')); print(json.dumps(r['test']['per_class'], indent=2))"
 ```
 
+## v1.0-submission — full 3-axis matrix + noise-robustness eval + visualizations
+
+### Noise-robustness eval (3 seeds × 5 SNRs, on test split with additive Gaussian noise)
+
+| Arm | SNR | macro-F1 | accuracy | belly_pain rec. | burping rec. | ECE |
+|---|---|---:|---:|---:|---:|---:|
+| baseline (none + weighted_ce) | clean | 0.193 | 0.797 | 0.000 | 0.000 | 0.285 |
+| baseline | 20 dB | 0.194 | 0.807 | 0.000 | 0.000 | 0.275 |
+| baseline | 10 dB | 0.173 | 0.546 | 0.111 | 0.333 | 0.222 |
+| baseline | 5 dB | 0.011 | 0.020 | 0.111 | 1.000 | 0.524 |
+| baseline | 0 dB | 0.027 | 0.048 | 0.889 | 0.000 | 0.617 |
+| generative + weighted_ce | clean | **0.258** | **0.817** | 0.000 | **0.667** | 0.352 |
+| generative | 20 dB | **0.267** | **0.831** | 0.000 | **0.667** | 0.367 |
+| generative | 10 dB | **0.186** | **0.768** | 0.000 | 0.333 | 0.334 |
+| generative | 5 dB | 0.077 | 0.044 | 0.000 | 0.667 | 0.563 |
+| generative | 0 dB | 0.013 | 0.034 | 0.333 | 0.333 | 0.668 |
+
+Key finding: generative augmentation holds **76.8% accuracy at 10 dB SNR** where the baseline drops to **54.6%**. Below 10 dB both arms collapse (high rare-class recall values reflect near-random argmax, not robustness).
+
+Raw per-seed numbers: `robustness_none_weighted_ce.csv`, `robustness_generative_weighted_ce.csv`. Figure: `../report/figures/robustness.png`.
+
+### Confusion matrix figures
+
+- `../report/figures/confusion_baseline.png`: none+weighted_ce seed 0 — predicts hungry for every test instance.
+- `../report/figures/confusion_generative.png`: generative+weighted_ce seed 2 — predictions distribute, burping caught (1/1), discomfort partial (2/4), tired partial.
+
+---
+
 ## v1.0-submission — full 3-axis matrix (36 cells: 4 aug × 3 recipes × 3 seeds)
 
 After integrating the Donate-A-Cry-Augmented Kaggle corpus (with content-level

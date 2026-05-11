@@ -180,6 +180,17 @@ generative + weighted\_ce             & clean & \textbf{0.258} & \textbf{0.817} 
 
 Two observations matter. First, in the deployment-relevant range (SNR $\ge$ 10~dB) generative augmentation is meaningfully more robust than the baseline: at 10~dB the generative cell holds 76.8\% accuracy versus the baseline's 54.6\%, and the \textit{burping} recall gap (0.333 vs.\ 0.333 at 10~dB, but 0.667 vs.\ 0.000 at 20~dB) persists. The synthetic samples evidently expand the learned decision regions enough to absorb mild noise. Second, both arms collapse below 10~dB to near-random argmax behavior (accuracy 2--4\%, ECE 0.5--0.9); the high \textit{burping} or \textit{belly\_pain} recall values reported at 5/0~dB are statistical artifacts of essentially uniform predictions across the 5 classes on a 1-clip class, not a robustness gain, and the report flags them as such.
 
+\subsection{Synth-to-real ratio sweep}\label{sec:ratiosweep}
+Section~\ref{sec:matrix} fixes the rare-class synth ratio at 3$\times$. To check that this choice is not at the edge of a cliff, we sweep the ratio $\in \{0, 1, 2, 3\}\times$ for the best cell (\textit{generative + weighted\_ce}), three seeds each, holding everything else fixed. The 0$\times$ point reuses the corresponding \textit{none + weighted\_ce} rows from Table~\ref{tab:matrix}.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/ratio_sweep.png}
+\caption{Synth-to-real ratio sweep. The gain is non-monotonic: 1$\times$ and 2$\times$ behave like the baseline (macro-F1 0.18--0.19, no \textit{burping} recovery), but 3$\times$ crosses an argmax threshold and the \textit{burping} recall jumps from 0 to 0.667. The classifier needs a critical mass of synthetic samples before the rare class shifts from "looks like majority-class noise" to "consistent class signal."}\label{fig:ratio}
+\end{figure}
+
+The reading is clinical: at this data scale, adding a few synthetic clips is not enough -- the classifier ignores them as noise -- but past a per-class synth-to-real ratio of about 2--3$\times$, the synth pool becomes statistically dense enough that the loss favours a non-trivial decision region for the rare class. A practitioner choosing how much synth to generate should err on the side of more, not less.
+
 \section{Ethics and Limitations}\label{sec:ethicslim}
 The accompanying datasheet and model card document data provenance, class imbalance, missing demographic annotations, and out-of-scope uses. Per-class false-negative rate (especially on \textit{belly\_pain}) is reported alongside aggregate metrics in every table. The data-quality issue we surfaced in the Kaggle redistribution is itself a fairness-relevant finding: a deployed model trained naively on the redistributed labels would treat hungry cries as belly\_pain. Safety-critical class labels in public corpora warrant content-level deduplication.
 

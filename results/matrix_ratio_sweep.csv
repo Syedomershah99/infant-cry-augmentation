@@ -1,0 +1,10 @@
+accuracy,aug_type,belly_pain_fnr,belly_pain_recall,best_val_macro_f1,burping_fnr,burping_recall,cell,discomfort_recall,ece,hungry_recall,macro_f1,recipe,seed,status,synth_ratio,tired_recall
+0.8406,generative,1.0,0.0,0.1824,1.0,0.0,generative_weighted_ce_r1_s0,0.0,0.3291,1.0,0.1827,weighted_ce,0,ok,1,0.0
+0.8406,generative,1.0,0.0,0.1824,1.0,0.0,generative_weighted_ce_r1_s1,0.0,0.3591,1.0,0.1827,weighted_ce,1,ok,1,0.0
+0.8406,generative,1.0,0.0,0.3839,1.0,0.0,generative_weighted_ce_r1_s2,0.0,0.238,1.0,0.1827,weighted_ce,2,ok,1,0.0
+0.7826,generative,1.0,0.0,0.2338,1.0,0.0,generative_weighted_ce_r2_s0,0.25,0.3173,0.9138,0.2145,weighted_ce,0,ok,2,0.0
+0.8406,generative,1.0,0.0,0.1824,1.0,0.0,generative_weighted_ce_r2_s1,0.0,0.2092,1.0,0.1827,weighted_ce,1,ok,2,0.0
+0.8406,generative,1.0,0.0,0.1824,1.0,0.0,generative_weighted_ce_r2_s2,0.0,0.2417,1.0,0.1827,weighted_ce,2,ok,2,0.0
+0.8406,generative,1.0,0.0,0.1824,1.0,0.0,generative_weighted_ce_r3_s0,0.0,0.3461,1.0,0.1827,weighted_ce,0,ok,3,0.0
+0.7826,generative,1.0,0.0,0.2618,0.0,1.0,generative_weighted_ce_r3_s1,0.0,0.3601,0.9138,0.2267,weighted_ce,1,ok,3,0.0
+0.8261,generative,1.0,0.0,0.2467,0.0,1.0,generative_weighted_ce_r3_s2,0.5,0.3494,0.931,0.3631,weighted_ce,2,ok,3,0.0
