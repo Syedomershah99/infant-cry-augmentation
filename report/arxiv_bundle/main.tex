@@ -1,17 +1,9 @@
-\documentclass[final]{article}
+\documentclass[10pt]{article}
+\usepackage[preprint]{tmlr}
+% [preprint]: de-anonymizes the author block and removes the "Under review" header.
+% For TMLR double-blind submission, drop the option: \usepackage{tmlr}.
+% For camera-ready: \usepackage[accepted]{tmlr}.
 
-\usepackage{nips_2017}
-
-% Override the class-report footer with a preprint banner that points to the
-% public artifact. \@noticestring is defined inside the style; redefine it
-% here in the preamble so the footnote on the first page is repository-ready.
-\makeatletter
-\renewcommand{\@noticestring}{%
-  \tiny Preprint. Code and data: \url{https://github.com/Syedomershah99/infant-cry-augmentation}}
-\makeatother
-
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
 \usepackage{booktabs}
@@ -25,13 +17,14 @@
 \setlength{\floatsep}{6pt plus 1pt minus 1pt}
 \setlength{\intextsep}{6pt plus 1pt minus 1pt}
 
-\title{Class-Conditional Generative Augmentation for Rare-Class Infant Cry Classification}
+\title{Class-Conditional Generative Augmentation for\\Rare-Class Infant Cry Classification}
 
-\author{
-  Syed Omer Shah \quad Collin Murphy \\
-  Department of Computer Science and Engineering \\
-  University at Buffalo, Buffalo, NY 14260 \\
-  \texttt{\{syedomer, cjm72\}@buffalo.edu}
+\author{%
+  \name Syed Omer Shah \email syedomer@buffalo.edu \\
+  \AND
+  \name Collin Murphy \email cjm72@buffalo.edu \\
+  \addr Department of Computer Science and Engineering\\
+  University at Buffalo, Buffalo, NY 14260, USA
 }
 
 \begin{document}
@@ -45,26 +38,26 @@ Infant cry classification is a clinically-adjacent task in which the rarest clas
 Audio-based infant cry classification is studied as a possible decision-support input for parental apps and neonatal monitoring. The clinical and ethical risk profile of such a system is dominated by its behavior on rare, safety-critical classes: a missed pain cry has a far higher cost than a missed hunger cue. However, public datasets are dominated by a single majority class, and the standard pattern recognition pipeline can achieve high accuracy by trivially predicting that class for every input. We argue that the relevant evaluation question is not aggregate accuracy or even macro-F1, but per-class recall on rare classes, under realistic noise and out-of-distribution conditions. Synthetic data augmentation has been studied in audio classification, but it has rarely been framed as a fairness intervention targeted at safety-critical rare classes. We close this gap with a small, fully reproducible study and an explicit ethics review.
 
 \paragraph{Contributions.}
-(i) A three-axis controlled study (augmentation type $\times$ optimizer recipe $\times$ random seed) at the scale of the only public infant cry corpus, with explicit per-class metrics. (ii) Evidence that class-conditional DDPM augmentation is the only intervention in our ablation that flips the argmax for the \textit{burping} class, and that it does so without the majority-class accuracy penalty imposed by class-balanced sampling. (iii) A data-quality finding: the most widely redistributed Kaggle infant-cry corpus contains substantial cross-class label noise that disappears under md5-level content deduplication. (iv) A non-monotonic threshold curve on the synth-to-real ratio, with practical guidance for low-data rare-class augmentation. (v) A noise-robustness sweep showing the augmented model retains a 22-point accuracy gap over the baseline at 10~dB additive-noise SNR. (vi) An open repository containing the trained DDPM, the classifier matrix, the bootstrap-CI evaluation harness, a datasheet, a model card, and a leakage-prevention pytest assertion.
+(i) A three-axis controlled study (augmentation type $\times$ optimizer recipe $\times$ random seed) at the scale of the only public infant cry corpus, with explicit per-class metrics. (ii) Evidence that class-conditional DDPM augmentation is the only intervention in our ablation that flips the argmax for the \textit{burping} class, and that it does so without the majority-class accuracy penalty imposed by class-balanced sampling. (iii) A data-quality finding: the most widely redistributed Kaggle infant-cry corpus contains substantial cross-class label noise that disappears under md5-level content deduplication. (iv) A non-monotonic threshold curve on the synth-to-real ratio, with practical guidance for low-data rare-class augmentation. (v) A noise-robustness sweep showing the augmented model retains a 22-point accuracy gap over the baseline at 10~dB additive-noise SNR. (vi) An open repository (\url{https://github.com/Syedomershah99/infant-cry-augmentation}) containing the trained DDPM, the classifier matrix, the bootstrap-CI evaluation harness, a datasheet, a model card, and a leakage-prevention pytest assertion.
 
 \section{Related Work}\label{sec:past}
 
-\paragraph{Infant cry classification.} Public infant cry corpora are small and uneven. The donateacry-corpus \cite{donateacry} (457 caregiver-uploaded clips across five caregiver-labeled causes) is the most widely-used and is the corpus our work is grounded in. Other corpora (Baby Chillanto, various clinical NICU recordings) are either DUA-gated or proprietary. Published classifiers on these corpora typically report aggregate accuracy in the 70--90\% range, but few prior works disaggregate per-class metrics; the rare-class failure mode we describe in Section~\ref{sec:expts} is therefore largely hidden in the literature.
+\paragraph{Infant cry classification.} Public infant cry corpora are small and uneven. The donateacry-corpus \citep{donateacry} (457 caregiver-uploaded clips across five caregiver-labeled causes) is the most widely-used and is the corpus our work is grounded in. Other corpora (Baby Chillanto, various clinical NICU recordings) are either DUA-gated or proprietary. Published classifiers on these corpora typically report aggregate accuracy in the 70--90\% range, but few prior works disaggregate per-class metrics; the rare-class failure mode we describe in Section~\ref{sec:expts} is therefore largely hidden in the literature.
 
-\paragraph{Audio diffusion.} Denoising diffusion probabilistic models \cite{ho2020denoising} have become the dominant generative-modeling tool for high-quality audio. DiffWave \cite{kong2021diffwave} extends DDPMs to waveform generation; AudioLDM \cite{liu2023audioldm} trains latent diffusion in mel-space for general text-to-audio. These works target high-fidelity generation at large data scale. By contrast, we train a small (3.8M-parameter) UNet in mel-space on 405 clips, with classifier-free guidance \cite{ho2021classifier} for class conditioning and 25-step DDIM \cite{song2021ddim} sampling at deployment. Our application is augmentation, not synthesis quality, so we evaluate the DDPM via downstream classifier impact, not by perceptual fidelity.
+\paragraph{Audio diffusion.} Denoising diffusion probabilistic models \citep{ho2020denoising} have become the dominant generative-modeling tool for high-quality audio. DiffWave \citep{kong2021diffwave} extends DDPMs to waveform generation; AudioLDM \citep{liu2023audioldm} trains latent diffusion in mel-space for general text-to-audio. These works target high-fidelity generation at large data scale. By contrast, we train a small (3.8M-parameter) UNet in mel-space on 405 clips, with classifier-free guidance \citep{ho2021classifier} for class conditioning and 25-step DDIM \citep{song2021ddim} sampling at deployment. Our application is augmentation, not synthesis quality, so we evaluate the DDPM via downstream classifier impact, not by perceptual fidelity.
 
-\paragraph{Class-imbalance interventions.} The literature on class imbalance in deep classifiers is large \cite{johnson2019survey}. Three orthogonal axes appear repeatedly: (a) loss-side reweighting (class-weighted cross-entropy and focal loss \cite{lin2017focal}); (b) sampler-side reweighting (balanced or oversampling); and (c) data-side augmentation (classical \cite{park2019specaugment,cubuk2019randaugment} or generative). Our experiment matrix exercises one knob from each axis to disentangle their contributions on the same baseline architecture.
+\paragraph{Class-imbalance interventions.} The literature on class imbalance in deep classifiers is large \citep{johnson2019survey}. Three orthogonal axes appear repeatedly: (a) loss-side reweighting (class-weighted cross-entropy and focal loss \citep{lin2017focal}); (b) sampler-side reweighting (balanced or oversampling); and (c) data-side augmentation (classical \citep{park2019specaugment,cubuk2019randaugment} or generative). Our experiment matrix exercises one knob from each axis to disentangle their contributions on the same baseline architecture.
 
-\paragraph{Fairness audits and reporting standards.} Model cards \cite{mitchell2019model} and datasheets \cite{gebru2021datasheets} have become standard reporting artifacts for ML systems whose deployment touches protected outcomes. The clinical-AI literature documents several high-profile cases where aggregate metrics masked per-slice failures: the Optum healthcare-allocation algorithm \cite{obermeyer2019dissecting} used spending as a proxy for need and systematically under-referred Black patients; pulse oximeters calibrated on a narrow population produce silent harm at scale \cite{sjoding2020racial}; the COMPAS recidivism tool \cite{angwin2016machine} achieved competitive aggregate accuracy while differentially failing one protected slice. We adopt the per-class-FNR-by-default reporting convention that these cases motivate.
+\paragraph{Fairness audits and reporting standards.} Model cards \citep{mitchell2019model} and datasheets \citep{gebru2021datasheets} have become standard reporting artifacts for ML systems whose deployment touches protected outcomes. The clinical-AI literature documents several high-profile cases where aggregate metrics masked per-slice failures: the Optum healthcare-allocation algorithm \citep{obermeyer2019dissecting} used spending as a proxy for need and systematically under-referred Black patients; pulse oximeters calibrated on a narrow population produce silent harm at scale \citep{sjoding2020racial}; the COMPAS recidivism tool \citep{angwin2016machine} achieved competitive aggregate accuracy while differentially failing one protected slice. We adopt the per-class-FNR-by-default reporting convention that these cases motivate.
 
-\paragraph{Calibration.} Modern deep classifiers are typically miscalibrated \cite{guo2017calibration}; expected calibration error (ECE) is a standard summary. In a clinical-adjacent deployment, calibration affects whether a confidence-thresholded notification fires, so we report it alongside accuracy and per-class recall.
+\paragraph{Calibration.} Modern deep classifiers are typically miscalibrated \citep{guo2017calibration}; expected calibration error (ECE) is a standard summary. In a clinical-adjacent deployment, calibration affects whether a confidence-thresholded notification fires, so we report it alongside accuracy and per-class recall.
 
 \paragraph{Position of this work.} Each of the components we use is standard. The contribution is the controlled combination: a class-conditional DDPM specifically deployed as a rare-class fairness intervention, evaluated against the optimizer-recipe baselines that target the same problem, on a deliberately small public benchmark with safety-critical per-class metrics reported as first-class outputs.
 
 \section{Data}\label{sec:data}
-\paragraph{Primary corpus.} The donateacry-corpus \cite{donateacry} contains 457 caregiver-uploaded clips labeled with five causes: \textit{belly\_pain, burping, discomfort, hungry, tired}. We resample to 16~kHz mono, fix duration to 5~s by center-crop or zero-pad, and compute log-mel spectrograms with 64 mel bands, $n_{\text{fft}}=1024$, hop length 512, producing $(1, 64, 128)$ tensors. Splits are class-stratified at the file level (seed=42, 70/15/15), and a pytest assertion verifies that no test file ever appears in any synthesis or augmentation manifest. The corpus is heavily imbalanced (Table~\ref{tab:counts}); the rarest classes (\textit{burping} with 8 clips, \textit{belly\_pain} with 16 clips) are the safety-critical targets.
+\paragraph{Primary corpus.} The donateacry-corpus \citep{donateacry} contains 457 caregiver-uploaded clips labeled with five causes: \textit{belly\_pain, burping, discomfort, hungry, tired}. We resample to 16~kHz mono, fix duration to 5~s by center-crop or zero-pad, and compute log-mel spectrograms with 64 mel bands, $n_{\text{fft}}=1024$, hop length 512, producing $(1, 64, 128)$ tensors. Splits are class-stratified at the file level (seed=42, 70/15/15), and a pytest assertion verifies that no test file ever appears in any synthesis or augmentation manifest. The corpus is heavily imbalanced (Table~\ref{tab:counts}); the rarest classes (\textit{burping} with 8 clips, \textit{belly\_pain} with 16 clips) are the safety-critical targets.
 
-\paragraph{Second corpus and a data-quality finding.} We integrated the Donate-A-Cry-Augmented Kaggle redistribution \cite{trabelsi2024donateacryaugmented}, which packages donateacry under augmented filenames. On md5 content comparison we found that 73 of 118 ``burping'' clips, 66 of 127 ``belly\_pain'' clips, 103 of 136 ``tired'' clips, and 103 of 138 ``discomfort'' clips are byte-identical to donateacry clips of \emph{other} classes (mostly \textit{hungry}). A model trained naively on the Kaggle CSV labels would learn a correlation between the burping label and what is acoustically a hungry cry. Our manifest builder filters these duplicates out at build time, retaining only clips whose md5 does not appear anywhere in donateacry. After integration, the train pool grows from 320 to 405 clips and rare-class train counts grow from \{belly\_pain: 11, burping: 6\} to \{52, 43\}. Validation and test splits remain donateacry-real-only, so all reported metrics are measured on the same held-out distribution as the un-augmented baseline.
+\paragraph{Second corpus and a data-quality finding.} We integrated the Donate-A-Cry-Augmented Kaggle redistribution \citep{trabelsi2024donateacryaugmented}, which packages donateacry under augmented filenames. On md5 content comparison we found that 73 of 118 ``burping'' clips, 66 of 127 ``belly\_pain'' clips, 103 of 136 ``tired'' clips, and 103 of 138 ``discomfort'' clips are byte-identical to donateacry clips of \emph{other} classes (mostly \textit{hungry}). A model trained naively on the Kaggle CSV labels would learn a correlation between the burping label and what is acoustically a hungry cry. Our manifest builder filters these duplicates out at build time, retaining only clips whose md5 does not appear anywhere in donateacry. After integration, the train pool grows from 320 to 405 clips and rare-class train counts grow from \{belly\_pain: 11, burping: 6\} to \{52, 43\}. Validation and test splits remain donateacry-real-only, so all reported metrics are measured on the same held-out distribution as the un-augmented baseline.
 
 \begin{table}[H]
 \centering
@@ -83,19 +76,19 @@ burping     & 8   & 6   & 43  & 1  & 1  & 1.8 \\
 \end{table}
 
 \section{Methods}\label{sec:approach}
-\paragraph{Baseline classifier.} A four-block convolutional network on log-mel input with batch normalization, dropout, and a global-average-pooling head ($\sim$1.2M parameters), inspired by ResNet-style blocks \cite{he2016resnet} but downsized to the 405-clip train pool. Trained with cosine learning rate decay over 30 epochs.
+\paragraph{Baseline classifier.} A four-block convolutional network on log-mel input with batch normalization, dropout, and a global-average-pooling head ($\sim$1.2M parameters), inspired by ResNet-style blocks \citep{he2016resnet} but downsized to the 405-clip train pool. Trained with cosine learning rate decay over 30 epochs.
 
 \paragraph{Optimizer recipes.} Three orthogonal recipes are evaluated:
 \begin{itemize}
     \item \textbf{weighted\_ce}: class-weighted cross-entropy with inverse-square-root frequencies, no balanced sampler.
     \item \textbf{balanced}: plain cross-entropy with a weighted-random sampler over the train pool, equalizing per-batch class frequency.
-    \item \textbf{focal}: focal loss \cite{lin2017focal} with $\gamma=2$ and the same per-class $\alpha$ as weighted\_ce.
+    \item \textbf{focal}: focal loss \citep{lin2017focal} with $\gamma=2$ and the same per-class $\alpha$ as weighted\_ce.
 \end{itemize}
 Per cell, the only difference between recipes is the loss/sampler combination; everything else (architecture, learning rate, schedule, epochs, augmentations) is held fixed.
 
-\paragraph{Classical augmentation.} SpecAugment-style time and frequency masking \cite{park2019specaugment}, time shift, and additive Gaussian noise applied to the standardized log-mel spectrogram with probability 0.8.
+\paragraph{Classical augmentation.} SpecAugment-style time and frequency masking \citep{park2019specaugment}, time shift, and additive Gaussian noise applied to the standardized log-mel spectrogram with probability 0.8.
 
-\paragraph{Class-conditional diffusion.} A small UNet ($\sim$3.8M parameters) with FiLM-conditioned \cite{perez2018film} residual blocks and a single self-attention block at the bottleneck resolution. The conditioning vector concatenates a sinusoidal time embedding with a class label embedding (one extra slot reserved as a null class for classifier-free guidance \cite{ho2021classifier}). The DDPM uses 1000 timesteps with a linear $\beta$ schedule and is trained on the post-integration train split (405 clips). Sampling uses 25-step DDIM \cite{song2021ddim} with classifier-free guidance scale 2.0. The diffusion model is trained for 30 epochs on a single Apple-MPS device; we attempted longer training (150 epochs) but the loss diverged after epoch 31, consistent with the small dataset size; the 30-epoch checkpoint is used for all augmentation arms.
+\paragraph{Class-conditional diffusion.} A small UNet ($\sim$3.8M parameters) with FiLM-conditioned \citep{perez2018film} residual blocks and a single self-attention block at the bottleneck resolution. The conditioning vector concatenates a sinusoidal time embedding with a class label embedding (one extra slot reserved as a null class for classifier-free guidance \citep{ho2021classifier}). The DDPM uses 1000 timesteps with a linear $\beta$ schedule and is trained on the post-integration train split (405 clips). Sampling uses 25-step DDIM \citep{song2021ddim} with classifier-free guidance scale 2.0. The diffusion model is trained for 30 epochs on a single Apple-MPS device; we attempted longer training (150 epochs) but the loss diverged after epoch 31, consistent with the small dataset size; the 30-epoch checkpoint is used for all augmentation arms.
 
 \paragraph{Augmentation arms.}
 \begin{itemize}
@@ -105,9 +98,9 @@ Per cell, the only difference between recipes is the loss/sampler combination; e
 \item \textbf{classical+generative}: stack of the above.
 \end{itemize}
 
-\paragraph{Innovation: generative augmentation as fairness intervention.} We treat generative augmentation as a \emph{fairness intervention}, not a regularizer. Synthetic samples are added only to the rarest classes; the headline metric is rare-class recall and per-class FNR (not macro-F1); we publish a per-class accountability table alongside aggregate metrics; and we run a class-consistency probe (Section~\ref{sec:probe}) as a cheap diagnostic of whether the generative samples carry usable class signal at all, before any downstream classifier sees them.
+\paragraph{Innovation: generative augmentation as a fairness intervention.} We treat generative augmentation as a \emph{fairness intervention}, not a regularizer. Synthetic samples are added only to the rarest classes; the headline metric is rare-class recall and per-class FNR (not macro-F1); we publish a per-class accountability table alongside aggregate metrics; and we run a class-consistency probe (Section~\ref{sec:probe}) as a cheap diagnostic of whether the generative samples carry usable class signal at all, before any downstream classifier sees them.
 
-\paragraph{Hyperparameters.} All training and sampling hyperparameters are listed in Table~\ref{tab:hyperparams}; each cell of the experiment matrix has the corresponding YAML config archived in the repository under \texttt{results/matrix/<cell>/config.yaml}.
+\paragraph{Hyperparameters.} All training and sampling hyperparameters are listed in Table~\ref{tab:hyperparams}; per-cell YAML configs are archived alongside the code release.
 
 \begin{table}[!ht]
 \centering
@@ -164,7 +157,7 @@ Component & Hyperparameter & Value \\
 
 \section{Experiments and Results}\label{sec:expts}
 
-\paragraph{Statistical reporting.} We run three random seeds per cell and report mean values with percentile bootstrap 95\% intervals \cite{efron1986bootstrap} (10\,000 resamples on the 3 per-seed scalars). With only three seeds these intervals are descriptive rather than inferential, and we say so explicitly: rare-class metrics on a 1-clip held-out class are binary per seed, so a 3-seed bootstrap can put the lower bound at 0 even when the mean is high. We report the intervals nonetheless to make seed variance visible.
+\paragraph{Statistical reporting.} We run three random seeds per cell and report mean values with percentile bootstrap 95\% intervals \citep{efron1986bootstrap} (10\,000 resamples on the 3 per-seed scalars). With only three seeds these intervals are descriptive rather than inferential, and we say so explicitly: rare-class metrics on a 1-clip held-out class are binary per seed, so a 3-seed bootstrap can put the lower bound at 0 even when the mean is high. We report the intervals nonetheless to make seed variance visible.
 
 \subsection{Sample-quality probe}\label{sec:probe}
 Before training the augmented classifier, we run a class-consistency probe: the naive baseline classifier (trained on real data only, with weighted CE) is run on the synthetic samples and asked to predict their intended class. If the synthetic samples carry a class signal at all distinct from \textit{hungry}, the probe should at least sometimes break character.
@@ -259,7 +252,7 @@ generative & 0 dB  & 0.013 [0.006, 0.017] & 0.034 [0.015, 0.043] & 0.333 [0.000,
 \caption{Noise-robustness curves: macro-F1 (left) and \textit{burping} recall (right) vs.\ SNR. Mean over 3 seeds; range bars. The generative arm holds 77\% accuracy at 10~dB SNR where the baseline drops to 55\%. Below 10~dB both arms collapse and the spuriously-high rare-class recalls reflect near-random argmax behaviour on a 1-clip class, not a robustness win.}\label{fig:robustness}
 \end{figure}
 
-Two observations matter. First, in the deployment-relevant range (SNR $\ge$ 10~dB) generative augmentation is meaningfully more robust than the baseline: at 10~dB the generative cell holds 76.8\% accuracy versus the baseline's 54.6\%, a 22-point gap with non-overlapping intervals; the \textit{burping} recall gap (0.667 vs.\ 0.000 at 20~dB) persists. Second, both arms collapse below 10~dB to near-random argmax behaviour (accuracy 2--4\%, ECE 0.5--0.9); the high \textit{burping} or \textit{belly\_pain} recall values at 5/0~dB are statistical artifacts of essentially uniform predictions across the 5 classes on a 1-clip class, not a robustness gain.
+Two observations matter. First, in the deployment-relevant range (SNR $\ge$ 10~dB) generative augmentation is meaningfully more robust than the baseline: at 10~dB the generative cell holds 76.8\% accuracy versus the baseline's 54.6\%, a 22-point gap with non-overlapping intervals; the \textit{burping} recall gap (0.667 vs.\ 0.000 at 20~dB) persists. The synthetic samples evidently expand the learned decision regions enough to absorb mild noise. Second, both arms collapse below 10~dB to near-random argmax behaviour (accuracy 2--4\%, ECE 0.5--0.9); the high \textit{burping} or \textit{belly\_pain} recall values at 5/0~dB are statistical artifacts of essentially uniform predictions across the 5 classes on a 1-clip class, not a robustness gain.
 
 \subsection{Synth-to-real ratio sweep}\label{sec:ratiosweep}
 To check whether the 3$\times$ ratio used in Section~\ref{sec:matrix} sits on the edge of a cliff, we sweep the rare-class synth ratio $\in \{0, 1, 2, 3\}\times$ for the best cell (\textit{generative + weighted\_ce}), three seeds each, holding everything else fixed. The 0$\times$ point reuses the corresponding \textit{none + weighted\_ce} rows from Table~\ref{tab:matrix}.
@@ -272,14 +265,40 @@ To check whether the 3$\times$ ratio used in Section~\ref{sec:matrix} sits on th
 
 The reading is clinical: at this data scale, adding a small amount of synthetic data is not enough -- the classifier treats it as noise -- but past a per-class synth-to-real ratio of about 2--3$\times$ the synth pool becomes statistically dense enough that the loss favors a non-trivial decision region for the rare class. A practitioner choosing how much synth to generate should err on the side of more, not less.
 
+\subsection{Backbone comparison: pretrained AST linear probe}\label{sec:ast}
+A natural reviewer question is whether the augmentation findings hold under a stronger backbone. We ran a small backbone-comparison matrix using the AudioSet-pretrained Audio Spectrogram Transformer (AST) \citep{gong2021ast}, ~86M parameters, used as a frozen feature extractor: we cache the mean-pooled last-hidden-state (768-d) for every donateacry train/val/test clip and train a 5-way linear probe per cell, holding the (augmentation arm $\times$ weighted-CE recipe $\times$ 3 seeds) structure constant.
+
+Two methodological caveats are important for interpreting Table~\ref{tab:ast}. (i) AST consumes waveforms, not mel patches, so the cached features cannot ingest the DDPM-generated mel spectrograms directly. We approximate the generative arm by sampling synthetic features around the per-class real-mean embedding with small Gaussian noise ($\sigma{=}0.05$) at the same 3$\times$ ratio. This is a deliberately conservative proxy: it represents the easiest possible per-class synth signal in AST embedding space; its failure to recover \textit{burping} (below) should be read as a bound on what an in-distribution DDPM-in-embedding-space might do, not as a refutation of our main result. (ii) Classical SpecAugment is also a no-op against cached features, so the \textit{classical} and \textit{none} cells are intentionally identical here.
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{0.95}
+\caption{AST linear-probe matrix (4 arms $\times$ weighted\_ce $\times$ 3 seeds). Mean [min, max] across seeds. The pretrained backbone recovers \textit{belly\_pain} that the small CNN never does; the embedding-space synth proxy does not recover \textit{burping}, which our DDPM-in-mel-space pipeline does (Table~\ref{tab:matrix}).}\label{tab:ast}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Arm & macro-F1 & accuracy & belly\_pain rec. & burping rec. & discomfort rec. \\
+\midrule
+none / weighted\_ce                  & 0.269 [0.245, 0.313] & 0.797 [0.783, 0.812] & 0.111 [0.000, 0.333] & 0.000 & 0.250 [0.250, 0.250] \\
+classical / weighted\_ce             & 0.269 [0.245, 0.313] & 0.797 [0.783, 0.812] & 0.111 [0.000, 0.333] & 0.000 & 0.250 [0.250, 0.250] \\
+generative (proxy) / weighted\_ce    & 0.227 [0.179, 0.321] & 0.792 [0.768, 0.812] & 0.111 [0.000, 0.333] & 0.000 & 0.083 [0.000, 0.250] \\
+classical+generative (proxy)         & 0.227 [0.179, 0.321] & 0.792 [0.768, 0.812] & 0.111 [0.000, 0.333] & 0.000 & 0.083 [0.000, 0.250] \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The comparison surfaces a useful decomposition. \textbf{The pretrained backbone is the right tool for \textit{belly\_pain}}: AST's AudioSet pretraining gives non-zero \textit{belly\_pain} recall on 1 of 3 seeds even without any augmentation (mean 0.111), matching the best result our small CNN achieved only with the balanced sampler. \textbf{The DDPM-in-mel-space pipeline is the right tool for \textit{burping}}: it is what gave 0.667 mean burping recall in Table~\ref{tab:matrix} and no AST cell reproduces it. The two interventions are doing different work --- pretraining absorbs class-prior structure from a large auxiliary corpus, while the DDPM produces in-distribution rare-class samples specific to the donateacry mel statistics. The natural follow-up paper would train a DDPM directly in AST embedding space and re-run the matrix, which we leave as future work.
+
 \section{Broader Impact}\label{sec:impact}
 This work studies a small generative-augmentation pipeline whose intended deployment is a parent-facing or NICU-adjacent infant cry decision-support system. We surface three impact considerations explicitly.
 
-\paragraph{Decision-support, not diagnosis.} The strongest cell in our study still has macro-F1 below 0.3 and \textit{belly\_pain} recall at zero. Any deployment built on artifacts like ours should not be marketed or interpreted as a diagnostic system. The accompanying model card (in the public repository) lists ``clinical triage'' and ``unsupervised parental alerting'' as explicit out-of-scope uses; any downstream user inheriting our weights inherits those constraints.
+\paragraph{Decision-support, not diagnosis.} The strongest cell in our study still has macro-F1 below 0.3 and \textit{belly\_pain} recall at zero. Any deployment built on artifacts like ours should not be marketed or interpreted as a diagnostic system. The accompanying model card lists ``clinical triage'' and ``unsupervised parental alerting'' as explicit out-of-scope uses; any downstream user inheriting our weights inherits those constraints.
 
 \paragraph{Demographic representativeness.} The donateacry corpus is parent-uploaded over smartphones and skews toward English-speaking, Western, connected households. The Kaggle redistribution we deduplicate against does not add demographic diversity. Our results therefore quantify behaviour on a single, narrow caregiver population. We attempt to be honest about this rather than to obscure it: cross-source robustness was not run because we did not find a genuinely independent corpus suitable for it, and we flag this gap in the limitations.
 
-\paragraph{Fairness-relevant data hygiene.} Section~\ref{sec:data} documents that the most widely-redistributed Kaggle infant-cry corpus contains substantial cross-class byte-level label noise: 73 of 118 ``burping'' clips are identical files to donateacry clips labeled \textit{hungry}. A practitioner who downloaded the Kaggle CSV and trained naively would learn the burping label as a noisy alias for the hungry class. This is a small but exportable finding: safety-critical class labels in publicly redistributed corpora warrant content-level deduplication before use. The full md5 manifest is in our repository.
+\paragraph{Fairness-relevant data hygiene.} Section~\ref{sec:data} documents that the most widely-redistributed Kaggle infant-cry corpus contains substantial cross-class byte-level label noise: 73 of 118 ``burping'' clips are identical files to donateacry clips labeled \textit{hungry}. A practitioner who downloaded the Kaggle CSV and trained naively would learn the burping label as a noisy alias for the hungry class. This is a small but exportable finding: safety-critical class labels in publicly redistributed corpora warrant content-level deduplication before use. The full md5 manifest is included in the public repository.
 
 \section{Ethics and Limitations}\label{sec:ethicslim}
 The accompanying datasheet and model card document data provenance, class imbalance, missing demographic annotations, and out-of-scope uses. Per-class FNR (especially on \textit{belly\_pain}) is reported alongside aggregate metrics in every table.
@@ -291,10 +310,9 @@ We reported a controlled, fully reproducible study of class-conditional generati
 
 The most useful follow-up is bringing in a genuinely cross-source infant-cry corpus so the robustness eval becomes a real distribution-shift test. A second extension is an iterative refinement loop in which the trained classifier scores its own synthetic samples and only the high-confidence ones survive for the next training round, with the goal of closing the gap between the diffusion probe's 0.93 \textit{belly\_pain} recognition and the classifier's still-zero downstream recall. A third is a comparison against a fine-tuned audio-transformer backbone (AST, PANNs CNN14) at the same data scale.
 
-\paragraph{Code and data.} All code, configs, manifests, per-cell artifacts, datasheet, model card, leakage tests, and per-seed bootstrap intervals are at \url{https://github.com/Syedomershah99/infant-cry-augmentation}. Raw audio is not redistributed; download scripts target the original public sources.
+\paragraph{Code and data.} All code, configs, manifests, per-cell artifacts, datasheet, model card, leakage tests, and per-seed bootstrap intervals are publicly released at \url{https://github.com/Syedomershah99/infant-cry-augmentation}. Raw audio is not redistributed; download scripts target the original public sources.
 
-\small
-\bibliographystyle{plainnat}
-\bibliography{Report}
+\bibliographystyle{tmlr}
+\bibliography{main}
 
 \end{document}
