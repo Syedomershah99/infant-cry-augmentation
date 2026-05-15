@@ -1,0 +1,23 @@
+seed: 2
+device: cpu
+features_root: data/ast_features
+manifests:
+  train: data/manifests/train.csv
+  val: data/manifests/val.csv
+  test: data/manifests/test.csv
+aug_type: generative
+synth_ratio: 3
+synth_sigma: 0.05
+in_dim: 768
+dropout: 0.1
+class_weight_scheme: inverse_sqrt
+use_class_weighted_loss: true
+balanced_sampler: false
+loss:
+  type: ce
+label_smoothing: 0.05
+batch_size: 32
+epochs: 50
+lr: 0.001
+weight_decay: 0.0001
+out_dir: /Users/Omer/Desktop/UB/spring 26/PR/Final Project/infant-cry-augmentation/results/ast_probe/generative_weighted_ce_s2

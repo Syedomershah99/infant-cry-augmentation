@@ -1,0 +1,30 @@
+# AST linear-probe baseline. Frozen 768-d AST embeddings -> 5-way linear head.
+seed: 0
+device: cpu              # linear probe on 768-d vectors is faster on CPU than MPS
+features_root: data/ast_features
+
+manifests:
+  train: data/manifests/train.csv
+  val:   data/manifests/val.csv
+  test:  data/manifests/test.csv
+
+aug_type: none           # one of {none, classical, generative, classical+generative}
+synth_ratio: 3           # used only when aug_type contains "generative"
+synth_sigma: 0.05        # Gaussian noise around per-class real-mean embedding
+
+in_dim: 768
+dropout: 0.10
+
+# Imbalance handling (matches main matrix's weighted_ce recipe)
+class_weight_scheme: inverse_sqrt
+use_class_weighted_loss: true
+balanced_sampler: false
+loss:
+  type: ce
+label_smoothing: 0.05
+
+batch_size: 32
+epochs: 50
+lr: 1.0e-3
+weight_decay: 1.0e-4
+out_dir: results/ast_probe/none_weighted_ce_s0
