@@ -75,15 +75,17 @@ Infant cry classification is a clinically-adjacent task in which the rarest clas
 ### Primary subject class
 
 ```
-cs.SD (Sound)
+cs.LG (Machine Learning)
 ```
+
+**Why cs.LG as primary**: the author's existing arXiv endorsement is in `cs.LG` (ML). arXiv endorsements are category-specific and do not transfer. An earlier submission with `cs.SD` as primary was rejected with arXiv's generic "needs more review" template, which is what moderators apply when no valid endorser exists for the chosen primary. The paper itself is defensibly a machine-learning paper (class-imbalance interventions, generative augmentation, fairness audits applied to audio data) — `cs.LG` is the correct primary for the endorsement we hold.
 
 ### Secondary (cross-list) subject classes
 
 ```
-cs.LG (Machine Learning)
-cs.CY (Computers and Society)
+cs.SD (Sound)
 eess.AS (Audio and Speech Processing)
+cs.CY (Computers and Society)
 ```
 
 ### Journal reference
